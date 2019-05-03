@@ -1,5 +1,6 @@
 import React, { useReducer, Reducer } from 'react';
 import { Box, Color } from 'ink';
+import figures from 'figures';
 import { useStdinInput } from '../hooks/use-stdin-input';
 
 interface Choice {
@@ -185,11 +186,13 @@ const MultiSelect = <C extends Choice>({
           return (
             <Box key={choice.name} textWrap="truncate">
               <Box marginRight={1} marginLeft={1}>
-                {current ? '❯' : ' '}
+                {current ? figures.pointer : ' '}
               </Box>
 
               <Box marginRight={2}>
-                <Color green={selected}>{selected ? '◉' : '◯'}</Color>
+                <Color green={selected}>
+                  {selected ? figures.circleFilled : figures.circle}
+                </Color>
               </Box>
 
               <Box>

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { promisify } from 'util';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import readPkg from 'read-pkg-up';
 import { excludeFalse } from '../utils';
 
 const readFile = promisify(fs.readFile);
@@ -146,14 +147,19 @@ const typescript: Package = {
   name: 'typescript',
   description: 'With basic tsconfig.json',
   getConfig: async (_, packageJson: PackageJSON): Promise<PackageConfig> => {
+    const pkg = await readPkg({ cwd: __dirname });
+
     const content = await readFile(
-      join(__dirname, './templates/tsconfig.json'),
+      join(dirname(pkg.path), './assets/tsconfig.json'),
       'utf-8',
     );
 
-    const hasReact = packageJson.dependencies.react != null;
-    const hasReactDOM = packageJson.dependencies['react-dom'] != null;
-    const hasJest = packageJson.devDependencies.jest != null;
+    const hasReact =
+      packageJson.dependencies && packageJson.dependencies.react != null;
+    const hasReactDOM =
+      packageJson.dependencies && packageJson.dependencies['react-dom'] != null;
+    const hasJest =
+      packageJson.devDependencies && packageJson.devDependencies.jest != null;
 
     return {
       packages: [

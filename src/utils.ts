@@ -3,22 +3,18 @@ import { promisify } from 'util';
 import execa from 'execa';
 import readPkg from 'read-pkg-up';
 import { dirname, join } from 'path';
-import { merge } from 'lodash';
-import { Package, PackageJSON } from './Setup/packages';
-import { TaskDefinition } from './components/Tasks';
 
 const access = promisify(fs.access);
-const writeFile = promisify(fs.writeFile);
 
 /**
- * excludeFalse is a typescript compatible version of `Boolean` when used
+ * `excludeFalse` is a Typescript compatible version of `Boolean` when used
  * together with `[].filter`;
  *
  * @example
  * [1, null, 2, 3].filter(excludeFalse); // [1, 2, 3];
  * [1, null, 2, 3].filter(Boolean); // [1, 2, 3];
  *
- * @param {T | false} x Any value
+ * @param {(T | false)} x Any value
  * @return {boolean} Return true for any non false value
  */
 export const excludeFalse = (Boolean as any) as <T>(x: T | false) => x is T;
@@ -107,72 +103,9 @@ export const detectPackageManager = async (): Promise<'yarn' | 'npm'> => {
   );
 };
 
-export const packagesToTasks = async (
-  packages: Package[],
-): Promise<TaskDefinition[]> => {
-  const packageJson = await readPkg();
-  const pkgDir = dirname(packageJson.path);
-
-  const configs = await Promise.all(
-    packages.map(async p => {
-      const config = await p.getConfig(
-        packages,
-        (packageJson.pkg as unknown) as PackageJSON,
-      );
-      return config;
-    }),
-  );
-
-  const installPackages: TaskDefinition = {
-    name: 'Install packages',
-    description: 'Install dev dependencies',
-    action: async () => {
-      const dependencies = configs.flatMap(config => config.packages || []);
-      const uniqueDeps = unique(dependencies);
-
-      const packageManager = await detectPackageManager();
-      const args = [];
-
-      if (packageManager === 'npm') {
-        args.push('install', '--save-dev');
-      } else {
-        args.push('add', '--dev');
-      }
-
-      await execa(packageManager, [...args, ...uniqueDeps], {
-        cwd: pkgDir,
-      });
-    },
-  };
-
-  const updatePackageJson: TaskDefinition = {
-    name: 'Update package.json',
-    description: 'Add configs to package.json',
-    action: async () => {
-      const packageJsonConfigs = configs.flatMap(
-        config => config.packageJson || {},
-      );
-
-      const newPackageJson = merge(packageJson.pkg, ...packageJsonConfigs);
-      await writeFile(
-        packageJson.path,
-        JSON.stringify(newPackageJson, null, 2),
-      );
-    },
-  };
-
-  const createConfigFiles: TaskDefinition = {
-    name: 'Create config files',
-    description: 'Write out config files',
-    action: async () => {
-      const files = configs.flatMap(config => config.files || []);
-      await Promise.all(
-        files.map(({ path, content }) =>
-          writeFile(join(pkgDir, path), content),
-        ),
-      );
-    },
-  };
-
-  return [installPackages, updatePackageJson, createConfigFiles];
+export const runSerial = (tasks: (() => Promise<void>)[]): Promise<void> => {
+  return tasks.reduce(async (chain, nextTask) => {
+    await chain;
+    return nextTask();
+  }, Promise.resolve());
 };
