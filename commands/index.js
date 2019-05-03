@@ -7,7 +7,11 @@ const Hello = ({ name }) => <Text>Hello, {name}!</Text>;
 
 Hello.propTypes = {
   /// Name of the person to greet
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
+};
+
+Hello.defaultProps = {
+  name: 'world',
 };
 
 export default Hello;
