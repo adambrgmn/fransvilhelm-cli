@@ -31,7 +31,7 @@ export interface PackageConfig {
 
 export type GetConfigFn = (
   selectedPackages: Package[],
-  packageJson: PackageJSON,
+  packageJson?: PackageJSON,
 ) => PackageConfig | Promise<PackageConfig>;
 
 export interface Package {
@@ -64,6 +64,37 @@ const eslint: Package = {
           extends: 'react-app',
         },
       },
+    };
+  },
+};
+
+const jest: Package = {
+  name: 'jest',
+  description: 'With react-testing-library',
+  getConfig: async (selectedPackages: Package[]): Promise<PackageConfig> => {
+    const pkg = await readPkg({ cwd: __dirname });
+    const hasTypescript =
+      selectedPackages.findIndex(p => p.name === typescript.name) > -1;
+
+    const jestConfigContent = await readFile(
+      join(dirname(pkg.path), './assets/jest.config.js'),
+      'utf-8',
+    );
+
+    return {
+      packages: [
+        'jest',
+        'jest-dom',
+        'react-testing-library',
+        hasTypescript && 'ts-jest',
+        hasTypescript && '@types/jest',
+      ].filter(excludeFalse),
+      packageJson: {
+        script: {
+          test: 'jest',
+        },
+      },
+      files: [{ path: 'jest.config.js', content: jestConfigContent }],
     };
   },
 };
@@ -146,7 +177,7 @@ const commitizen: Package = {
 const typescript: Package = {
   name: 'typescript',
   description: 'With basic tsconfig.json',
-  getConfig: async (_, packageJson: PackageJSON): Promise<PackageConfig> => {
+  getConfig: async (_, packageJson?: PackageJSON): Promise<PackageConfig> => {
     const pkg = await readPkg({ cwd: __dirname });
 
     const content = await readFile(
@@ -155,11 +186,13 @@ const typescript: Package = {
     );
 
     const hasReact =
-      packageJson.dependencies && packageJson.dependencies.react != null;
+      packageJson != null &&
+      packageJson.dependencies != null &&
+      packageJson.dependencies.react != null;
     const hasReactDOM =
-      packageJson.dependencies && packageJson.dependencies['react-dom'] != null;
-    const hasJest =
-      packageJson.devDependencies && packageJson.devDependencies.jest != null;
+      packageJson != null &&
+      packageJson.dependencies != null &&
+      packageJson.dependencies['react-dom'] != null;
 
     return {
       packages: [
@@ -167,7 +200,6 @@ const typescript: Package = {
         '@types/node',
         hasReact && '@types/react',
         hasReactDOM && '@types/react-dom',
-        hasJest && '@types/jest',
       ].filter(excludeFalse),
       files: [{ path: 'tsconfig.json', content }],
     };
@@ -176,6 +208,7 @@ const typescript: Package = {
 
 export const packages: Package[] = [
   eslint,
+  jest,
   husky,
   lintStaged,
   prettier,
