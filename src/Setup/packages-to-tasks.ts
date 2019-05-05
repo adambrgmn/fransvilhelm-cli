@@ -15,7 +15,8 @@ const packagesToTasks = async (
   packages: Package[],
 ): Promise<TaskDefinition[]> => {
   const packageJson = await readPkg();
-  const pkgDir = dirname(packageJson.path);
+  const pkgDir = packageJson.path ? dirname(packageJson.path) : process.cwd();
+  const pkgPath = packageJson.path || join(process.cwd(), 'package.json');
 
   const configs = await Promise.all(
     packages.map(p => p.getConfig(packages, packageJson.pkg as PackageJSON)),
@@ -44,19 +45,14 @@ const packagesToTasks = async (
     name: 'Update package.json',
     description: 'Add configs to package.json',
     action: async () => {
-      const currentPackageJson = JSON.parse(
-        await readFile(packageJson.path, 'utf-8'),
-      );
+      const currentPackageJson = JSON.parse(await readFile(pkgPath, 'utf-8'));
 
       const packageJsonConfigs = configs.flatMap(
         config => config.packageJson || {},
       );
 
       const newPackageJson = merge(currentPackageJson, ...packageJsonConfigs);
-      await writeFile(
-        packageJson.path,
-        JSON.stringify(newPackageJson, null, 2),
-      );
+      await writeFile(pkgPath, JSON.stringify(newPackageJson, null, 2));
     },
   };
 

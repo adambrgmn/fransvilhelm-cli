@@ -87,7 +87,7 @@ export const hasCommand = async (cmd: string): Promise<boolean> => {
  */
 export const detectPackageManager = async (): Promise<'yarn' | 'npm'> => {
   const packageJson = await readPkg();
-  const pkgDir = dirname(packageJson.path);
+  const pkgDir = packageJson.path ? dirname(packageJson.path) : process.cwd();
 
   const yarnLock = join(pkgDir, 'yarn.lock');
   const npmLock = join(pkgDir, 'package-lock.json');
