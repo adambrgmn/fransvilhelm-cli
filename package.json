@@ -1,7 +1,8 @@
 {
-  "name": "fransvilhelm-cli",
+  "name": "@fransvilhelm/cli",
   "version": "0.0.0",
   "license": "MIT",
+  "main": "./build/cli.js",
   "bin": {
     "frans": "./build/cli.js"
   },
@@ -14,7 +15,8 @@
     "cli": "./build/cli.js"
   },
   "files": [
-    "build"
+    "build",
+    "assets"
   ],
   "dependencies": {
     "@fransvilhelm/hooks": "^1.0.0",
@@ -55,6 +57,9 @@
     "lint-staged": "^8.1.5",
     "prettier": "^1.17.0",
     "typescript": "^3.4.5"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "eslintConfig": {
     "extends": "react-app"
