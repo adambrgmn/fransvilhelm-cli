@@ -228,6 +228,23 @@ const semanticRelease: Package = {
   },
 };
 
+const netlify: Package = {
+  name: 'netlify',
+  description: 'With basic SPA config',
+  getConfig: async (): Promise<PackageConfig> => {
+    const pkg = await readPkg({ cwd: __dirname });
+
+    const content = await readFile(
+      join(dirname(pkg.path), './assets/netlify.toml'),
+      'utf-8',
+    );
+
+    return {
+      files: [{ path: 'netlify.toml', content }],
+    };
+  },
+};
+
 export const packages: Package[] = [
   eslint,
   jest,
@@ -237,4 +254,5 @@ export const packages: Package[] = [
   typescript,
   commitizen,
   semanticRelease,
+  netlify,
 ];
