@@ -90,7 +90,7 @@ const jest: Package = {
         hasTypescript && '@types/jest',
       ].filter(excludeFalse),
       packageJson: {
-        script: {
+        scripts: {
           test: 'jest',
         },
       },
@@ -159,21 +159,6 @@ const prettier: Package = {
   }),
 };
 
-const commitizen: Package = {
-  name: 'commitizen',
-  description: 'With cz-conventional-changelog',
-  getConfig: (): PackageConfig => ({
-    packages: ['cz-conventional-changelog'],
-    packageJson: {
-      config: {
-        commitizen: {
-          path: 'cz-conventional-changelog',
-        },
-      },
-    },
-  }),
-};
-
 const typescript: Package = {
   name: 'typescript',
   description: 'With basic tsconfig.json',
@@ -206,12 +191,50 @@ const typescript: Package = {
   },
 };
 
+const commitizen: Package = {
+  name: 'commitizen',
+  description: 'With cz-conventional-changelog',
+  getConfig: (): PackageConfig => ({
+    packages: ['cz-conventional-changelog'],
+    packageJson: {
+      config: {
+        commitizen: {
+          path: 'cz-conventional-changelog',
+        },
+      },
+    },
+  }),
+};
+
+const semanticRelease: Package = {
+  name: 'semantic-release',
+  description: 'With basic Travis CI config',
+  getConfig: async (_, packageJson?: PackageJSON): Promise<PackageConfig> => {
+    const pkg = await readPkg({ cwd: __dirname });
+
+    const content = await readFile(
+      join(dirname(pkg.path), './assets/.travis.yml'),
+      'utf-8',
+    );
+
+    return {
+      packages: ['semantic-release'],
+      packageJson: {
+        scripts: { 'semantic-release': 'semantic-release' },
+        publishConfig: { access: 'public' },
+      },
+      files: [{ path: '.travis.yml', content }],
+    };
+  },
+};
+
 export const packages: Package[] = [
   eslint,
   jest,
   husky,
   lintStaged,
   prettier,
-  commitizen,
   typescript,
+  commitizen,
+  semanticRelease,
 ];
