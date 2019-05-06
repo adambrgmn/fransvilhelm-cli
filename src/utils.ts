@@ -103,9 +103,50 @@ export const detectPackageManager = async (): Promise<'yarn' | 'npm'> => {
   );
 };
 
+/**
+ * Use `runSerial` to run an array of promise returning functions in serial.
+ *
+ * @param {(() => Promise<void>)[]} tasks Array of functions returning a promise
+ * @returns {Promise<void>}
+ */
 export const runSerial = (tasks: (() => Promise<void>)[]): Promise<void> => {
   return tasks.reduce(async (chain, nextTask) => {
     await chain;
     return nextTask();
   }, Promise.resolve());
+};
+
+/**
+ * `allPass` runs a condition checking function on the items in an array to see
+ * if all returns true. If one of the returns false it will abort early and skip
+ * checking the rest.
+ *
+ * @template T Type of items in the array
+ * @param {T[]} items Array of items to check
+ * @param {(i: T) => boolean} condition Function returning true or false based on the item
+ * @returns {boolean} True if all pass the condition, false if a single item returns false
+ */
+export const allPass = <T>(
+  items: T[],
+  condition: (i: T) => boolean,
+): boolean => {
+  let idx = 0;
+  while (idx < items.length) {
+    if (!condition(items[idx])) return false;
+    idx += 1;
+  }
+
+  return true;
+};
+
+/**
+ * Restrict a number between min and max
+ *
+ * @param {number} n Number to clamp
+ * @param {number} min Max value
+ * @param {number} max Min value
+ * @returns {number}
+ */
+export const clamp = (n: number, min: number, max: number): number => {
+  return n < min ? min : n > max ? max : n;
 };

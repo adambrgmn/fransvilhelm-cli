@@ -27,7 +27,7 @@ const Setup = () => {
           }}
         />
       )}
-      {state === States.RUN_TASKS && <Tasks tasks={tasks} />}
+      {state === States.RUN_TASKS && <Tasks tasks={tasks} onDone={() => {}} />}
     </Box>
   );
 };

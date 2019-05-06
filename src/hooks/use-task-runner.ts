@@ -1,6 +1,7 @@
 import { useReducer, useEffect, useCallback } from 'react';
 import nanoid from 'nanoid';
-import { useIsMounted } from '@fransvilhelm/hooks';
+import { usePromise, AsyncState } from '@fransvilhelm/hooks';
+import { allPass, clamp } from '../utils';
 
 export enum TaskState {
   IDLE,
@@ -18,67 +19,64 @@ export interface TaskDefinition {
 export interface Task extends TaskDefinition {
   id: string;
   state: TaskState;
-  errorMessage?: string;
 }
 
 export enum Actions {
-  SET_PENDING,
-  SET_RESOLVED,
-  SET_REJECTED,
+  SET_CURRENT_PENDING,
+  SET_CURRENT_RESOLVED,
+  SET_CURRENT_REJECTED,
 }
 
 export type Action =
-  | { type: Actions.SET_PENDING; payload: { id: string } }
-  | { type: Actions.SET_RESOLVED; payload: { id: string } }
-  | { type: Actions.SET_REJECTED; payload: { id: string; message: string } };
+  | { type: Actions.SET_CURRENT_PENDING }
+  | { type: Actions.SET_CURRENT_RESOLVED }
+  | { type: Actions.SET_CURRENT_REJECTED; payload: { message: string } };
+
+export interface TaskError {
+  task: Task;
+  error: { message: string };
+}
 
 export interface State {
   tasks: Task[];
+  errors: TaskError[];
   current: number;
 }
 
 const reducer = (state: State, action: Action) => {
+  const maxCurrent = state.tasks.length - 1;
+  const currentTask = state.tasks[state.current];
+
+  const setTaskState = (id: string, nextState: TaskState): Task[] => {
+    return state.tasks.map((task: Task) => {
+      if (task.id === id && task.state !== nextState) {
+        return { ...task, state: nextState };
+      }
+
+      return task;
+    });
+  };
+
   switch (action.type) {
-    case Actions.SET_PENDING:
+    case Actions.SET_CURRENT_PENDING:
       return {
         ...state,
-        tasks: state.tasks.map(task => {
-          if (task.id === action.payload.id) {
-            return { ...task, state: TaskState.PENDING };
-          }
-
-          return task;
-        }),
+        tasks: setTaskState(currentTask.id, TaskState.PENDING),
       };
 
-    case Actions.SET_RESOLVED:
+    case Actions.SET_CURRENT_RESOLVED:
       return {
         ...state,
-        current: state.current + 1,
-        tasks: state.tasks.map(task => {
-          if (task.id === action.payload.id) {
-            return { ...task, state: TaskState.RESOLVED };
-          }
-
-          return task;
-        }),
+        current: clamp(state.current + 1, 0, maxCurrent),
+        tasks: setTaskState(currentTask.id, TaskState.RESOLVED),
       };
 
-    case Actions.SET_REJECTED:
+    case Actions.SET_CURRENT_REJECTED:
       return {
         ...state,
-        current: state.current + 1,
-        tasks: state.tasks.map(task => {
-          if (task.id === action.payload.id) {
-            return {
-              ...task,
-              state: TaskState.REJECTED,
-              errorMessage: action.payload.message,
-            };
-          }
-
-          return task;
-        }),
+        current: clamp(state.current + 1, 0, maxCurrent),
+        tasks: setTaskState(currentTask.id, TaskState.REJECTED),
+        errors: [...state.errors, { task: currentTask, error: action.payload }],
       };
 
     default:
@@ -86,50 +84,64 @@ const reducer = (state: State, action: Action) => {
   }
 };
 
-export const useTaskRunner = (tasks: TaskDefinition[]): State => {
-  const isMounted = useIsMounted();
-  const [state, dispatch] = useReducer(reducer, {
-    tasks: prepareTasks(tasks),
+type OnDoneCallback = (tasks: Task[]) => void;
+
+/**
+ * `useTaskRunner` will run the actions of a set of tasks, defined as
+ * `TaskDefinition`s, in serial and report the current state of the tasks.
+ *
+ * @param {TaskDefinition[]} taskDefinitions A set of tasks with name and action to run
+ * @param {OnDoneCallback} onDone Callback fired once all tasks are settled (resolved or rejected)
+ * @returns {State} The current state with tasks and index of current task being proccessed
+ */
+export const useTaskRunner = (
+  taskDefinitions: TaskDefinition[],
+  onDone: OnDoneCallback,
+): State => {
+  const [state, dispatch] = useReducer(reducer, undefined, () => ({
+    tasks: prepareTasks(taskDefinitions),
+    errors: [],
     current: 0,
-  });
+  }));
 
-  const runNextTask = useCallback(async () => {
-    const hasPendingTask =
-      state.tasks.findIndex(t => t.state === TaskState.PENDING) > -1;
+  const { tasks, current } = state;
 
-    if (hasPendingTask) return;
-
-    const nextTaskIndex = state.current;
-    const nextTask = state.tasks[nextTaskIndex];
-    if (!nextTask) return;
-
-    dispatch({ type: Actions.SET_PENDING, payload: nextTask });
-
-    try {
-      await nextTask.action();
-      if (isMounted()) {
-        dispatch({ type: Actions.SET_RESOLVED, payload: nextTask });
-      }
-    } catch (err) {
-      if (isMounted()) {
-        dispatch({
-          type: Actions.SET_REJECTED,
-          payload: { id: nextTask.id, message: err.message },
-        });
-      }
-    }
-  }, [state, isMounted]);
+  const { action: currentAction } = tasks[current];
+  const [currentPromiseState, , error] = usePromise(currentAction, [
+    currentAction,
+  ]);
 
   useEffect(() => {
-    runNextTask();
-  }, [runNextTask]);
+    switch (currentPromiseState) {
+      case AsyncState.pending:
+        return dispatch({ type: Actions.SET_CURRENT_PENDING });
+
+      case AsyncState.fullfilled:
+        return dispatch({ type: Actions.SET_CURRENT_RESOLVED });
+
+      case AsyncState.rejected:
+        return dispatch({ type: Actions.SET_CURRENT_REJECTED, payload: error });
+
+      default:
+    }
+  }, [currentPromiseState, error]);
+
+  useEffect(() => {
+    const allSettled = allPass(
+      tasks,
+      t => t.state === TaskState.RESOLVED || t.state === TaskState.REJECTED,
+    );
+
+    if (allSettled) onDone(tasks);
+  }, [tasks, onDone]);
 
   return state;
 };
 
-const prepareTasks = (tasks: TaskDefinition[]): Task[] =>
-  tasks.map(task => ({
+const prepareTasks = (tasks: TaskDefinition[]): Task[] => {
+  return tasks.map(task => ({
     id: nanoid(),
     state: TaskState.IDLE,
     ...task,
   }));
+};
