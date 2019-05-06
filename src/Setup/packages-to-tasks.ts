@@ -52,7 +52,42 @@ const packagesToTasks = async (
       );
 
       const newPackageJson = merge(currentPackageJson, ...packageJsonConfigs);
-      await writeFile(pkgPath, JSON.stringify(newPackageJson, null, 2));
+
+      const keyOrder = unique([
+        'name',
+        'version',
+        'description',
+        'main',
+        'module',
+        'umd:main',
+        'source',
+        'types',
+        'repository',
+        'author',
+        'homepage',
+        'license',
+        'private',
+        'workspaces',
+        'bin',
+        'files',
+        'keywords',
+        'engines',
+        'scripts',
+        'dependencies',
+        'devDependencies',
+        'peerDependencies',
+        'publishConfig',
+        'config',
+        ...Object.keys(newPackageJson),
+      ]);
+
+      const orderedPackageJson = keyOrder.reduce((acc, key) => {
+        const value = newPackageJson[key];
+        if (value) return { ...acc, [key]: value };
+        return acc;
+      }, {});
+
+      await writeFile(pkgPath, JSON.stringify(orderedPackageJson, null, 2));
     },
   };
 
