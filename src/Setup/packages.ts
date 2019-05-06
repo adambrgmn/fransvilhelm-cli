@@ -135,7 +135,10 @@ const lintStaged: Package = {
           concurrent: false,
           linters: {
             ...(hasPrettier && {
-              '*.{js,ts,jsx,tsx,json,md,yml}': ['prettier --write', 'git add'],
+              '*.{js,ts,jsx,tsx,json,md,yml,html}': [
+                'prettier --write',
+                'git add',
+              ],
             }),
           },
         },
