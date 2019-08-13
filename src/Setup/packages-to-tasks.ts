@@ -2,11 +2,11 @@ import fs from 'fs';
 import execa from 'execa';
 import readPkg from 'read-pkg-up';
 import { dirname, join } from 'path';
-import { merge } from 'lodash';
+import { merge, flatMap } from 'lodash';
+import { promisify } from 'util';
 import { Package, PackageJSON } from './packages';
 import { TaskDefinition } from '../hooks/use-task-runner';
 import { unique, detectPackageManager } from '../utils';
-import { promisify } from 'util';
 
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
@@ -26,7 +26,7 @@ const packagesToTasks = async (
     name: 'Install packages',
     description: 'Install dev dependencies',
     action: async () => {
-      const dependencies = configs.flatMap(config => config.packages || []);
+      const dependencies = flatMap(configs, config => config.packages || []);
       const uniqueDeps = unique(dependencies);
       const packageManager = await detectPackageManager();
       const args = [];
@@ -47,7 +47,8 @@ const packagesToTasks = async (
     action: async () => {
       const currentPackageJson = JSON.parse(await readFile(pkgPath, 'utf-8'));
 
-      const packageJsonConfigs = configs.flatMap(
+      const packageJsonConfigs = flatMap(
+        configs,
         config => config.packageJson || {},
       );
 
@@ -95,7 +96,7 @@ const packagesToTasks = async (
     name: 'Create config files',
     description: 'Write out config files',
     action: async () => {
-      const files = configs.flatMap(config => config.files || []);
+      const files = flatMap(configs, config => config.files || []);
       await Promise.all(
         files.map(({ path, content }) =>
           writeFile(join(pkgDir, path), content),
