@@ -6,7 +6,7 @@ import { merge, flatMap } from 'lodash';
 import { promisify } from 'util';
 import { Package, PackageJSON } from './packages';
 import { TaskDefinition } from '../hooks/use-task-runner';
-import { unique, detectPackageManager } from '../utils';
+import { unique, detectPackageManager, PackageManager } from '../utils';
 
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
@@ -31,7 +31,7 @@ const packagesToTasks = async (
       const packageManager = await detectPackageManager();
       const args = [];
 
-      if (packageManager === 'npm') {
+      if (packageManager === PackageManager.npm) {
         args.push('install', '--save-dev');
       } else {
         args.push('add', '--dev');

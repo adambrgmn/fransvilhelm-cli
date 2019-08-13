@@ -72,6 +72,11 @@ export const hasCommand = async (cmd: string): Promise<boolean> => {
   }
 };
 
+export enum PackageManager {
+  npm = 'npm',
+  yarn = 'yarn',
+}
+
 /**
  * `detectPackageManager` will detect which package manager that should be used
  * in the current project.
@@ -83,20 +88,20 @@ export const hasCommand = async (cmd: string): Promise<boolean> => {
  * @example
  * await detectPackageManager(); // 'yarn' or 'npm'
  *
- * @returns {Promise<('yarn' | 'npm')>}
+ * @returns {Promise<PackageManager>}
  */
-export const detectPackageManager = async (): Promise<'yarn' | 'npm'> => {
+export const detectPackageManager = async (): Promise<PackageManager> => {
   const packageJson = await readPkg();
   const pkgDir = packageJson.path ? dirname(packageJson.path) : process.cwd();
 
   const yarnLock = join(pkgDir, 'yarn.lock');
   const npmLock = join(pkgDir, 'package-lock.json');
 
-  if (await fileExists(yarnLock)) return 'yarn';
-  if (await fileExists(npmLock)) return 'npm';
+  if (await fileExists(yarnLock)) return PackageManager.yarn;
+  if (await fileExists(npmLock)) return PackageManager.npm;
 
-  if (await hasCommand('yarn')) return 'yarn';
-  if (await hasCommand('npm')) return 'npm';
+  if (await hasCommand('yarn')) return PackageManager.yarn;
+  if (await hasCommand('npm')) return PackageManager.npm;
 
   throw new Error(
     'Could not detect package manager. Neither yarn or npm seems to exist',
@@ -123,12 +128,12 @@ export const runSerial = (tasks: (() => Promise<void>)[]): Promise<void> => {
  *
  * @template T Type of items in the array
  * @param {T[]} items Array of items to check
- * @param {(i: T) => boolean} condition Function returning true or false based on the item
+ * @param {(item: T) => boolean} condition Function returning true or false based on the item
  * @returns {boolean} True if all pass the condition, false if a single item returns false
  */
 export const allPass = <T>(
   items: T[],
-  condition: (i: T) => boolean,
+  condition: (item: T) => boolean,
 ): boolean => {
   let idx = 0;
   while (idx < items.length) {
