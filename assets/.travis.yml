@@ -11,7 +11,7 @@ cache:
 notifications:
   email: false
 
-script: yarn test && yarn build
+script: yarn run test && yarn run build
 
 branches:
   only:
