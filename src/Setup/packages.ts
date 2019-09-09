@@ -83,7 +83,7 @@ const eslint: Package = {
       packages: hasReactScripts
         ? []
         : [
-            'eslint-config-react-app@5.0.0',
+            'eslint-config-react-app@5.x',
             'babel-eslint@10.x',
             'eslint@6.x',
             'eslint-plugin-flowtype@3.x',
