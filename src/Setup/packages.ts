@@ -42,6 +42,8 @@ const readFile = promisify(fs.readFile);
 
 const readAsset = async (filename: string): Promise<string> => {
   const pkg = await readPkg({ cwd: __dirname });
+  if (!pkg) throw new Error('Could not read package data');
+
   const content = await readFile(
     join(dirname(pkg.path), './assets', filename),
     'utf-8',
@@ -83,7 +85,7 @@ const eslint: Package = {
       packages: hasReactScripts
         ? []
         : [
-            'eslint-config-react-app@5.0.2',
+            'eslint-config-react-app@5.1.0',
             'babel-eslint@10.x',
             'eslint@6.x',
             'eslint-plugin-flowtype@3.x',
