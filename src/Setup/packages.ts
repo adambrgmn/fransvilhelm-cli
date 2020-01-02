@@ -56,15 +56,10 @@ const hasInstalledPackage = (
   pkgName: string,
   packageJson?: PackageJSON,
 ): boolean => {
-  if (packageJson != null && packageJson.dependencies != null) {
-    return packageJson.dependencies[pkgName] != null;
-  }
-
-  if (packageJson != null && packageJson.devDependencies != null) {
-    return packageJson.devDependencies[pkgName] != null;
-  }
-
-  return false;
+  return (
+    packageJson?.dependencies?.[pkgName] != null &&
+    packageJson?.devDependencies?.[pkgName] != null
+  );
 };
 
 const hasSelectedPackage = (
@@ -119,6 +114,7 @@ const jest: Package = {
         !hasReactScripts && 'jest',
         '@testing-library/jest-dom',
         '@testing-library/react',
+        '@testing-library/user-event',
         hasTypescript && '@types/jest',
         ...(!hasReactScripts && hasTypescript
           ? [
