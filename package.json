@@ -1,11 +1,15 @@
 {
   "name": "@fransvilhelm/cli",
   "version": "0.0.0",
-  "license": "MIT",
   "main": "./build/cli.js",
+  "license": "MIT",
   "bin": {
     "frans": "./build/cli.js"
   },
+  "files": [
+    "build",
+    "assets"
+  ],
   "engines": {
     "node": ">=8"
   },
@@ -14,10 +18,6 @@
     "build": "pastel build",
     "cli": "./build/cli.js"
   },
-  "files": [
-    "build",
-    "assets"
-  ],
   "dependencies": {
     "@fransvilhelm/hooks": "^1.1.0",
     "@types/nanoid": "^2.1.0",
@@ -38,28 +38,33 @@
     "@types/figures": "^3.0.1",
     "@types/ink": "^2.0.3",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^13.1.2",
+    "@types/node": "^13.7.4",
     "@types/prop-types": "^15.7.3",
     "@types/react": "^16.9.17",
     "@types/read-pkg-up": "^6.0.0",
-    "@typescript-eslint/eslint-plugin": "2.14.0",
-    "@typescript-eslint/parser": "2.14.0",
+    "@typescript-eslint/eslint-plugin": "2.x",
+    "@typescript-eslint/parser": "2.x",
     "babel-eslint": "10.x",
-    "cz-conventional-changelog": "^3.0.2",
-    "eslint": "5.x",
-    "eslint-config-react-app": "^4.0.0",
-    "eslint-plugin-flowtype": "2.x",
+    "cz-conventional-changelog": "^3.1.0",
+    "eslint": "6.x",
+    "eslint-config-react-app": "5.2.0",
+    "eslint-plugin-flowtype": "4.x",
     "eslint-plugin-import": "2.x",
     "eslint-plugin-jsx-a11y": "6.x",
     "eslint-plugin-react": "7.x",
-    "eslint-plugin-react-hooks": "1.5.0",
-    "husky": "^3.1.0",
-    "lint-staged": "^9.5.0",
+    "eslint-plugin-react-hooks": "2.x",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.7",
     "prettier": "^1.19.1",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -73,16 +78,15 @@
     "*.{js,ts,jsx,tsx,json,md,yml}": [
       "prettier --write",
       "git add"
+    ],
+    "*.{js,ts,jsx,tsx,json,md,yml,html}": [
+      "prettier --write",
+      "git add"
     ]
   },
   "prettier": {
     "singleQuote": true,
     "trailingComma": "all",
     "proseWrap": "always"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
   }
 }
