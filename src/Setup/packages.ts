@@ -118,8 +118,13 @@ const jest: Package = {
         !hasReactScripts && 'jest',
         '@testing-library/jest-dom',
         '@testing-library/react',
-        '@testing-library/user-event',
-        hasTypescript && '@types/jest',
+        ...(hasTypescript
+          ? [
+              '@types/jest',
+              '@types/testing-library__jest-dom',
+              '@types/testing-library__react',
+            ]
+          : []),
         ...(!hasReactScripts && hasTypescript
           ? [
               '@babel/core',
@@ -177,10 +182,8 @@ const lintStaged: Package = {
       packageJson: {
         'lint-staged': {
           ...(hasPrettier && {
-            '*.{js,ts,jsx,tsx,json,md,yml,html}': [
-              'prettier --write',
-              'git add',
-            ],
+            '*.{js,ts,jsx,tsx}': ['eslint --fix'],
+            '*.{js,ts,jsx,tsx,json,md,yml,html}': ['prettier --write'],
           }),
         },
       },
