@@ -2,8 +2,8 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { join, dirname } from 'path';
 import readPkg from 'read-pkg-up';
-import axios from 'axios';
 import { excludeFalse } from '../utils';
+import { packageWithPeers } from './package-with-peers';
 
 export interface PackageJSON {
   name: string;
@@ -84,24 +84,13 @@ const eslint: Package = {
 
     let packages: string[] = [];
     if (!hasReactScripts) {
-      const { data } = await axios.get<PackageJSON>(
-        'https://unpkg.com/eslint-config-react-app@latest/package.json',
-      );
-      packages.push(`${data.name}@${data.version}`);
+      packages = await packageWithPeers('eslint-config-react-app');
 
-      for (let [dep, version] of Object.entries(data.peerDependencies ?? [])) {
-        if (!dep.includes('@typescripts-eslint') || hasTypescript) {
-          packages.push(`${dep}@${version}`);
-        }
+      if (!hasTypescript) {
+        packages = packages.filter(
+          (pkg) => !pkg.includes('@typescripts-eslint'),
+        );
       }
-
-      packages = await Promise.all(
-        packages.map((pkg) =>
-          axios
-            .get<PackageJSON>(`https://unpkg.com/${pkg}/package.json`)
-            .then(({ data }) => `${data.name}@^${data.version}`),
-        ),
-      );
     }
 
     return {
