@@ -46,8 +46,8 @@ const Dev: React.FC = () => {
         <Select
           key={folder}
           message={message}
-          choices={folderContent.filter(item => item.type === 'directory')}
-          onSelect={async choice => {
+          choices={folderContent.filter((item) => item.type === 'directory')}
+          onSelect={async (choice) => {
             if (
               choice.type === 'directory' &&
               (await isProject(choice.fullPath))

@@ -18,7 +18,7 @@ export const Select = <C extends Choice>({
 }: Props<C>) => {
   const [index, setIndex] = useState(0);
 
-  useStdinInput(key => {
+  useStdinInput((key) => {
     let nextIndex: number;
     switch (key) {
       case Keys.ARROW_DOWN:
@@ -36,7 +36,7 @@ export const Select = <C extends Choice>({
       default:
         if (key.length === 1) {
           let idx = choices.findIndex(
-            item => item.name.toLowerCase()[0] === key,
+            (item) => item.name.toLowerCase()[0] === key,
           );
           if (idx > -1) setIndex(idx);
         }

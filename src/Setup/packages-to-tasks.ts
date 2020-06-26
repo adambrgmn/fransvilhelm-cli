@@ -19,14 +19,14 @@ const packagesToTasks = async (
   const pkgPath = packageJson.path || join(process.cwd(), 'package.json');
 
   const configs = await Promise.all(
-    packages.map(p => p.getConfig(packages, packageJson.pkg as PackageJSON)),
+    packages.map((p) => p.getConfig(packages, packageJson.pkg as PackageJSON)),
   );
 
   const installPackages: TaskDefinition = {
     name: 'Install packages',
     description: 'Install dev dependencies',
     action: async () => {
-      const dependencies = flatMap(configs, config => config.packages || []);
+      const dependencies = flatMap(configs, (config) => config.packages || []);
       const uniqueDeps = unique(dependencies);
       const packageManager = await detectPackageManager();
       const args = [];
@@ -49,7 +49,7 @@ const packagesToTasks = async (
 
       const packageJsonConfigs = flatMap(
         configs,
-        config => config.packageJson || {},
+        (config) => config.packageJson || {},
       );
 
       const newPackageJson = merge(currentPackageJson, ...packageJsonConfigs);
@@ -96,7 +96,7 @@ const packagesToTasks = async (
     name: 'Create config files',
     description: 'Write out config files',
     action: async () => {
-      const files = flatMap(configs, config => config.files || []);
+      const files = flatMap(configs, (config) => config.files || []);
       await Promise.all(
         files.map(({ path, content }) =>
           writeFile(join(pkgDir, path), content),

@@ -40,7 +40,7 @@ const Tasks = ({ tasks, onDone }: Props) => {
   return (
     <Box flexDirection="column">
       <Box flexDirection="column">
-        {state.tasks.map(task => (
+        {state.tasks.map((task) => (
           <Box key={task.id}>
             <Box marginRight={1}>
               {task.state === TaskState.IDLE && <Idle />}

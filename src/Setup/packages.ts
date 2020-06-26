@@ -70,7 +70,7 @@ const hasSelectedPackage = (
   pkgName: string,
   selectedPackages: Package[],
 ): boolean => {
-  return selectedPackages.findIndex(p => p.name === pkgName) > -1;
+  return selectedPackages.findIndex((p) => p.name === pkgName) > -1;
 };
 
 const eslint: Package = {
@@ -90,7 +90,7 @@ const eslint: Package = {
       packages.push(`${data.name}@${data.version}`);
 
       for (let [dep, version] of Object.entries(data.peerDependencies ?? [])) {
-        let versions = version.split('||').map(v => v.trim());
+        let versions = version.split('||').map((v) => v.trim());
         let last = versions[versions.length - 1];
         if (!dep.includes('@typescripts-eslint') || hasTypescript) {
           packages.push(`${dep}@${last}`);
@@ -160,7 +160,7 @@ const jest: Package = {
 const husky: Package = {
   name: 'husky',
   description: 'With lint-staged precommit hook',
-  getConfig: selectedPackages => {
+  getConfig: (selectedPackages) => {
     const hasLintStaged = hasSelectedPackage(lintStaged.name, selectedPackages);
 
     return {
@@ -181,7 +181,7 @@ const husky: Package = {
 const lintStaged: Package = {
   name: 'lint-staged',
   description: 'With prettier setup',
-  getConfig: selectedPackages => {
+  getConfig: (selectedPackages) => {
     const hasPrettier = hasSelectedPackage(prettier.name, selectedPackages);
 
     return {

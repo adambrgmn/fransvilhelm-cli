@@ -30,7 +30,7 @@ export const excludeFalse = (Boolean as any) as <T>(x: T | false) => x is T;
  */
 export const unique = <I>(arr: I[]): I[] =>
   arr.reduce<I[]>((acc, item) => {
-    const exists = acc.findIndex(i => i === item) > -1;
+    const exists = acc.findIndex((i) => i === item) > -1;
     if (exists) return acc;
     return [...acc, item];
   }, []);

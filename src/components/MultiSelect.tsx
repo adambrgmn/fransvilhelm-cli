@@ -47,7 +47,7 @@ const reducer = <C extends Choice>(
       return {
         ...state,
         selected: state.selected.filter(
-          p => p.name !== action.payload.choice.name,
+          (p) => p.name !== action.payload.choice.name,
         ),
       };
 
@@ -113,7 +113,7 @@ const useMultiSelect = <C extends Choice>({
       case Keys.SPACE:
         const currentChoice = state.choices[state.current];
         const isSelected =
-          state.selected.findIndex(sc => sc.name === currentChoice.name) > -1;
+          state.selected.findIndex((sc) => sc.name === currentChoice.name) > -1;
 
         if (isSelected) {
           return dispatch({
@@ -169,7 +169,7 @@ const MultiSelect = <C extends Choice>({
         {state.choices.map((choice: Choice, i) => {
           const current = state.current === i;
           const selected =
-            state.selected.findIndex(sp => sp.name === choice.name) > -1;
+            state.selected.findIndex((sp) => sp.name === choice.name) > -1;
 
           return (
             <Box key={choice.name} textWrap="truncate">

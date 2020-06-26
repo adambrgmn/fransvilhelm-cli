@@ -129,7 +129,7 @@ export const useTaskRunner = (
   useEffect(() => {
     const allSettled = allPass(
       tasks,
-      t => t.state === TaskState.RESOLVED || t.state === TaskState.REJECTED,
+      (t) => t.state === TaskState.RESOLVED || t.state === TaskState.REJECTED,
     );
 
     if (allSettled) onDone(tasks);
@@ -139,7 +139,7 @@ export const useTaskRunner = (
 };
 
 const prepareTasks = (tasks: TaskDefinition[]): Task[] => {
-  return tasks.map(task => ({
+  return tasks.map((task) => ({
     id: nanoid(),
     state: TaskState.IDLE,
     ...task,
