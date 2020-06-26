@@ -82,7 +82,7 @@ const eslint: Package = {
       hasInstalledPackage('typescript', packageJson);
     const hasReactScripts = hasInstalledPackage('react-scripts', packageJson);
 
-    let packages = [];
+    let packages: string[] = [];
     if (!hasReactScripts) {
       const { data } = await axios.get<PackageJSON>(
         'https://unpkg.com/eslint-config-react-app@latest/package.json',
@@ -90,12 +90,18 @@ const eslint: Package = {
       packages.push(`${data.name}@${data.version}`);
 
       for (let [dep, version] of Object.entries(data.peerDependencies ?? [])) {
-        let versions = version.split('||').map((v) => v.trim());
-        let last = versions[versions.length - 1];
         if (!dep.includes('@typescripts-eslint') || hasTypescript) {
-          packages.push(`${dep}@${last}`);
+          packages.push(`${dep}@${version}`);
         }
       }
+
+      packages = await Promise.all(
+        packages.map((pkg) =>
+          axios
+            .get<PackageJSON>(`https://unpkg.com/${pkg}/package.json`)
+            .then(({ data }) => `${data.name}@^${data.version}`),
+        ),
+      );
     }
 
     return {
