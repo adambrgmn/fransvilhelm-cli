@@ -92,7 +92,7 @@ export enum PackageManager {
  */
 export const detectPackageManager = async (): Promise<PackageManager> => {
   const packageJson = await readPkg();
-  const pkgDir = packageJson.path ? dirname(packageJson.path) : process.cwd();
+  const pkgDir = packageJson?.path ? dirname(packageJson.path) : process.cwd();
 
   const yarnLock = join(pkgDir, 'yarn.lock');
   const npmLock = join(pkgDir, 'package-lock.json');

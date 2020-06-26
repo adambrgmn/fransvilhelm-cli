@@ -11,7 +11,7 @@ enum States {
   RUN_TASKS,
 }
 
-const Setup = () => {
+const Setup: React.FC = () => {
   const [state, setState] = useState(States.SELECT);
   const [tasks, setTasks] = useState<TaskDefinition[]>([]);
 

@@ -1,5 +1,5 @@
-import { useReducer, useEffect, useCallback } from 'react';
-import nanoid from 'nanoid';
+import { useReducer, useEffect } from 'react';
+import { nanoid } from 'nanoid';
 import { usePromise, AsyncState } from '@fransvilhelm/hooks';
 import { allPass, clamp } from '../utils';
 

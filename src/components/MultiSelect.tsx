@@ -1,9 +1,10 @@
 import React, { useReducer, Reducer } from 'react';
 import { Box, Color } from 'ink';
 import figures from 'figures';
-import { useStdinInput } from '../hooks/use-stdin-input';
+import { useStdinInput, Keys } from '../hooks/use-stdin-input';
+import { SelectFAQ, FaqItem } from './SelectFaq';
 
-interface Choice {
+export interface Choice {
   name: string;
   description?: string;
 }
@@ -30,17 +31,6 @@ type Action<C extends Choice> =
   | { type: Actions.REMOVE_ALL }
   | { type: Actions.TRAVERSE_UP }
   | { type: Actions.TRAVERSE_DOWN };
-
-enum Keys {
-  ARROW_UP = '\u001B[A',
-  ARROW_DOWN = '\u001B[B',
-  ARROW_RIGHT = '\u001b[C',
-  ARROW_LEFT = '\u001b[D',
-  ENTER = '\r',
-  SPACE = ' ',
-  A = 'a',
-  D = 'd',
-}
 
 const reducer = <C extends Choice>(
   state: State<C>,
@@ -158,15 +148,13 @@ const MultiSelect = <C extends Choice>({
   onConfirm,
 }: Props<C>) => {
   const state = useMultiSelect({ choices, onConfirm });
-  const faq = [
+  const faq: FaqItem[] = [
     ['Traverse:', 'Arrow keys'],
     ['Select:', '<space>'],
     ['Confirm:', '<enter>'],
     ['Select all:', '<a>'],
     ['Deselect all:', '<d>'],
   ];
-
-  const faqPadding = Math.max(...faq.map(([key]) => key.length));
 
   return (
     <Box flexDirection="column" width="100%">
@@ -206,18 +194,7 @@ const MultiSelect = <C extends Choice>({
         })}
       </Box>
 
-      <Box flexDirection="column">
-        {faq.map(([key, value]) => (
-          <Box marginLeft={1} key={key}>
-            <Color gray>
-              <Box minWidth={faqPadding} marginRight={1}>
-                {key}
-              </Box>
-              <Box>{value}</Box>
-            </Color>
-          </Box>
-        ))}
-      </Box>
+      <SelectFAQ faq={faq} />
     </Box>
   );
 };

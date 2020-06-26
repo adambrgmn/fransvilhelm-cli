@@ -2,6 +2,7 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { join, dirname } from 'path';
 import readPkg from 'read-pkg-up';
+import axios from 'axios';
 import { excludeFalse } from '../utils';
 
 export interface PackageJSON {
@@ -11,6 +12,9 @@ export interface PackageJSON {
     [packageName: string]: string;
   };
   devDependencies: {
+    [packageName: string]: string;
+  };
+  peerDependencies?: {
     [packageName: string]: string;
   };
   [x: string]: any;
@@ -72,27 +76,30 @@ const hasSelectedPackage = (
 const eslint: Package = {
   name: 'eslint',
   description: 'With eslint-config-react-app',
-  getConfig: (selectedPackages, packageJson) => {
+  getConfig: async (selectedPackages, packageJson) => {
     const hasTypescript =
       hasSelectedPackage(typescript.name, selectedPackages) ||
       hasInstalledPackage('typescript', packageJson);
     const hasReactScripts = hasInstalledPackage('react-scripts', packageJson);
 
+    let packages = [];
+    if (!hasReactScripts) {
+      const { data } = await axios.get<PackageJSON>(
+        'https://unpkg.com/eslint-config-react-app@latest/package.json',
+      );
+      packages.push(`${data.name}@${data.version}`);
+
+      for (let [dep, version] of Object.entries(data.peerDependencies ?? [])) {
+        let versions = version.split('||').map(v => v.trim());
+        let last = versions[versions.length - 1];
+        if (!dep.includes('@typescripts-eslint') || hasTypescript) {
+          packages.push(`${dep}@${last}`);
+        }
+      }
+    }
+
     return {
-      packages: hasReactScripts
-        ? []
-        : [
-            'eslint-config-react-app@5.2.0',
-            'babel-eslint@10.x',
-            'eslint@6.x',
-            'eslint-plugin-flowtype@4.x',
-            'eslint-plugin-import@2.x',
-            'eslint-plugin-jsx-a11y@6.x',
-            'eslint-plugin-react@7.x',
-            'eslint-plugin-react-hooks@2.x',
-            hasTypescript && '@typescript-eslint/eslint-plugin@2.x',
-            hasTypescript && '@typescript-eslint/parser@2.x',
-          ].filter(excludeFalse),
+      packages,
       packageJson: {
         eslintConfig: {
           extends: 'react-app',
