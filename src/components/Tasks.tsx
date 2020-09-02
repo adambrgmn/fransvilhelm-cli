@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Color, Text } from 'ink';
+import { Box, Text } from 'ink';
 import figures from 'figures';
 import {
   useTaskRunner,
@@ -24,13 +24,13 @@ const Pending = () => (
 
 const Resolved = () => (
   <Box>
-    <Color green>{figures.tick}</Color>
+    <Text color="green">{figures.tick}</Text>
   </Box>
 );
 
 const Rejected = () => (
   <Box>
-    <Color red>{figures.cross}</Color>
+    <Text color="red">{figures.cross}</Text>
   </Box>
 );
 
@@ -49,7 +49,9 @@ const Tasks = ({ tasks, onDone }: Props) => {
               {task.state === TaskState.REJECTED && <Rejected />}
             </Box>
             <Box>
-              <Color gray={task.state === TaskState.IDLE}>{task.name}</Color>
+              <Text color={task.state === TaskState.IDLE ? 'gray' : undefined}>
+                {task.name}
+              </Text>
             </Box>
           </Box>
         ))}
@@ -63,10 +65,10 @@ const Tasks = ({ tasks, onDone }: Props) => {
         {state.errors.map(({ task, error }) => (
           <Box key={task.id}>
             <Box marginLeft={2} marginRight={1}>
-              {task.name}:
+              <Text>{task.name}:</Text>
             </Box>
             <Box>
-              <Color red>{error.message}</Color>
+              <Text color="red">{error.message}</Text>
             </Box>
           </Box>
         ))}

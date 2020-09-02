@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Color } from 'ink';
+import { Box, Text } from 'ink';
 
 export type FaqItem = [string, string];
 
@@ -13,12 +13,12 @@ export const SelectFAQ: React.FC<Props> = ({ faq }) => {
     <Box flexDirection="column">
       {faq.map(([key, value]) => (
         <Box marginLeft={1} key={key}>
-          <Color gray>
-            <Box minWidth={faqPadding} marginRight={1}>
-              {key}
-            </Box>
-            <Box>{value}</Box>
-          </Color>
+          <Box minWidth={faqPadding} marginRight={1}>
+            <Text color="gray">{key}</Text>
+          </Box>
+          <Box>
+            <Text color="gray">{value}</Text>
+          </Box>
         </Box>
       ))}
     </Box>

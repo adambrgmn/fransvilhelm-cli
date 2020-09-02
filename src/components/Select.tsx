@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import figures from 'figures';
 import { Choice } from './MultiSelect';
-import { Box, Color } from 'ink';
+import { Box, Text, useInput } from 'ink';
 import { SelectFAQ, FaqItem } from './SelectFaq';
-import { useStdinInput, Keys } from '../hooks/use-stdin-input';
 
 interface Props<C extends Choice> {
   choices: C[];
@@ -18,25 +17,24 @@ export const Select = <C extends Choice>({
 }: Props<C>) => {
   const [index, setIndex] = useState(0);
 
-  useStdinInput((key) => {
+  useInput((input, key) => {
     let nextIndex: number;
-    switch (key) {
-      case Keys.ARROW_DOWN:
-      case Keys.ARROW_RIGHT:
+    switch (true) {
+      case key.downArrow:
+      case key.rightArrow:
         nextIndex = index + 1;
         return setIndex(nextIndex > choices.length - 1 ? 0 : nextIndex);
-      case Keys.ARROW_UP:
-      case Keys.ARROW_LEFT:
+      case key.upArrow:
+      case key.leftArrow:
         nextIndex = index - 1;
         return setIndex(nextIndex < 0 ? choices.length - 1 : nextIndex);
-      case Keys.ENTER:
-      case Keys.SPACE:
+      case key.return:
         let choice = choices[index];
         return onSelect(choice);
       default:
-        if (key.length === 1) {
+        if (input.length === 1) {
           let idx = choices.findIndex(
-            (item) => item.name.toLowerCase()[0] === key,
+            (item) => item.name.toLowerCase()[0] === input,
           );
           if (idx > -1) setIndex(idx);
         }
@@ -57,23 +55,31 @@ export const Select = <C extends Choice>({
     <Box flexDirection="column" width="100%">
       <Box marginBottom={1}>
         <Box marginRight={1}>
-          <Color green>?</Color>
+          <Text color="green">?</Text>
         </Box>
-        <Box>{message}</Box>
+        <Box>
+          <Text>{message}</Text>
+        </Box>
       </Box>
 
       <Box marginBottom={1} flexDirection="column">
         {choices.map((choice, idx) => (
-          <Box key={choice.name} textWrap="truncate">
+          <Box key={choice.name}>
             <Box marginRight={1} marginLeft={1}>
-              {idx === index ? figures.pointer : ' '}
+              <Text wrap="truncate">
+                {idx === index ? figures.pointer : ' '}
+              </Text>
             </Box>
 
             <Box>
-              <Color green={idx === index}>{choice.name} </Color>
+              <Text color={idx === index ? 'green' : undefined}>
+                {choice.name}{' '}
+              </Text>
               {choice.description && (
-                <Box textWrap="truncate">
-                  <Color gray>- {choice.description}</Color>
+                <Box>
+                  <Text wrap="truncate" color="gray">
+                    - {choice.description}
+                  </Text>
                 </Box>
               )}
             </Box>

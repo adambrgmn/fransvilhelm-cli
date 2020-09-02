@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as path from 'path';
 import * as os from 'os';
 import { promises as fs } from 'fs';
-import { Box, Text, Color } from 'ink';
+import { Box, Text } from 'ink';
 import execa from 'execa';
 import which from 'which';
 import clipboard from 'clipboardy';
@@ -47,16 +47,11 @@ const Dev: React.FC = () => {
           message={message}
           choices={folderContent.filter((item) => item.type === 'directory')}
           onSelect={async (choice) => {
-            if (
-              choice.type === 'directory' &&
-              (await isProject(choice.fullPath))
-            ) {
+            if (await isProject(choice.fullPath)) {
               return setSelectedProject(choice);
             }
 
-            if (choice.type === 'directory') {
-              return setFolder(choice.fullPath);
-            }
+            return setFolder(choice.fullPath);
           }}
         />
       )}
@@ -64,11 +59,11 @@ const Dev: React.FC = () => {
         <Box flexDirection="column">
           <Text>
             Selected project{' '}
-            <Color blue>
+            <Text color="blue">
               {selectedProject.fullPath.replace(initialFolder + '/', '')}
-            </Color>
+            </Text>
           </Text>
-          <Color grey>Projects full path added to clipboard</Color>
+          <Text color="grey">Projects full path added to clipboard</Text>
         </Box>
       )}
     </Box>

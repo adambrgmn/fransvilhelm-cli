@@ -1,7 +1,6 @@
 import React, { useReducer, Reducer } from 'react';
-import { Box, Color } from 'ink';
+import { Box, Text, useInput } from 'ink';
 import figures from 'figures';
-import { useStdinInput, Keys } from '../hooks/use-stdin-input';
 import { SelectFAQ, FaqItem } from './SelectFaq';
 
 export interface Choice {
@@ -94,23 +93,29 @@ const useMultiSelect = <C extends Choice>({
     current: 0,
   });
 
-  useStdinInput((input: string) => {
-    switch (input) {
-      case Keys.ARROW_DOWN:
-      case Keys.ARROW_RIGHT:
+  useInput((input, key) => {
+    switch (true) {
+      case key.downArrow:
+      case key.rightArrow:
         return dispatch({ type: Actions.TRAVERSE_DOWN });
 
-      case Keys.ARROW_UP:
-      case Keys.ARROW_LEFT:
+      case key.upArrow:
+      case key.leftArrow:
         return dispatch({ type: Actions.TRAVERSE_UP });
 
-      case Keys.A:
+      case key.return:
+        return onConfirm(state.selected);
+      default:
+    }
+
+    switch (input.toLowerCase()) {
+      case 'a':
         return dispatch({ type: Actions.ADD_ALL });
 
-      case Keys.D:
+      case 'd':
         return dispatch({ type: Actions.REMOVE_ALL });
 
-      case Keys.SPACE:
+      case ' ':
         const currentChoice = state.choices[state.current];
         const isSelected =
           state.selected.findIndex((sc) => sc.name === currentChoice.name) > -1;
@@ -126,10 +131,6 @@ const useMultiSelect = <C extends Choice>({
             payload: { choice: currentChoice },
           });
         }
-
-      case Keys.ENTER:
-        return onConfirm(state.selected);
-      default:
     }
   });
 
@@ -160,9 +161,11 @@ const MultiSelect = <C extends Choice>({
     <Box flexDirection="column" width="100%">
       <Box marginBottom={1}>
         <Box marginRight={1}>
-          <Color green>?</Color>
+          <Text color="green">?</Text>
         </Box>
-        <Box>{message}</Box>
+        <Box>
+          <Text>{message}</Text>
+        </Box>
       </Box>
 
       <Box marginBottom={1} flexDirection="column">
@@ -172,21 +175,23 @@ const MultiSelect = <C extends Choice>({
             state.selected.findIndex((sp) => sp.name === choice.name) > -1;
 
           return (
-            <Box key={choice.name} textWrap="truncate">
+            <Box key={choice.name}>
               <Box marginRight={1} marginLeft={1}>
-                {current ? figures.pointer : ' '}
+                <Text wrap="truncate">{current ? figures.pointer : ' '}</Text>
               </Box>
 
               <Box marginRight={2}>
-                <Color green={selected}>
+                <Text wrap="truncate" color={selected ? 'green' : undefined}>
                   {selected ? figures.circleFilled : figures.circle}
-                </Color>
+                </Text>
               </Box>
 
               <Box>
-                {choice.name}{' '}
-                <Box textWrap="truncate">
-                  <Color gray>- {choice.description}</Color>
+                <Text>{choice.name} </Text>
+                <Box>
+                  <Text wrap="truncate" color="gray">
+                    - {choice.description}
+                  </Text>
                 </Box>
               </Box>
             </Box>
