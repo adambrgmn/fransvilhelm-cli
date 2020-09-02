@@ -1,17 +1,11 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import figures from 'figures';
-import {
-  useTaskRunner,
-  Task,
-  TaskDefinition,
-  TaskState,
-} from '../hooks/use-task-runner';
+import { TaskInterpreter } from '../hooks/use-tasks';
 import { Spinner } from './Spinner';
 
 interface Props {
-  tasks: TaskDefinition[];
-  onDone: (tasks: Task[]) => void;
+  tasks: TaskInterpreter[];
 }
 
 const Idle = () => <Text> </Text>;
@@ -34,43 +28,34 @@ const Rejected = () => (
   </Box>
 );
 
-const Tasks = ({ tasks, onDone }: Props) => {
-  const state = useTaskRunner(tasks, onDone);
-
+const Tasks = ({ tasks }: Props) => {
   return (
     <Box flexDirection="column">
       <Box flexDirection="column">
-        {state.tasks.map((task) => (
-          <Box key={task.id}>
-            <Box marginRight={1}>
-              {task.state === TaskState.IDLE && <Idle />}
-              {task.state === TaskState.PENDING && <Pending />}
-              {task.state === TaskState.RESOLVED && <Resolved />}
-              {task.state === TaskState.REJECTED && <Rejected />}
-            </Box>
+        {tasks.map((task) => (
+          <React.Fragment key={task.id}>
             <Box>
-              <Text color={task.state === TaskState.IDLE ? 'gray' : undefined}>
-                {task.name}
-              </Text>
+              <Box marginRight={1}>
+                {task.state.matches('idle') && <Idle />}
+                {task.state.matches('pending') && <Pending />}
+                {task.state.matches('resolved') && <Resolved />}
+                {task.state.matches('rejected') && <Rejected />}
+              </Box>
+              <Box>
+                <Text color={task.state.matches('idle') ? 'gray' : undefined}>
+                  {task.state.context.description}
+                </Text>
+              </Box>
             </Box>
-          </Box>
-        ))}
-      </Box>
-      <Box flexDirection="column" marginTop={1}>
-        {state.errors.length > 0 && (
-          <Box>
-            <Rejected /> <Text bold>Errors:</Text>
-          </Box>
-        )}
-        {state.errors.map(({ task, error }) => (
-          <Box key={task.id}>
-            <Box marginLeft={2} marginRight={1}>
-              <Text>{task.name}:</Text>
-            </Box>
-            <Box>
-              <Text color="red">{error.message}</Text>
-            </Box>
-          </Box>
+            {task.state.matches('rejected') && (
+              <Box paddingLeft={4} marginBottom={1}>
+                <Text color="red">
+                  <Text bold>!</Text>{' '}
+                  {task.state.context.error ?? 'foo bar baz'}
+                </Text>
+              </Box>
+            )}
+          </React.Fragment>
         ))}
       </Box>
     </Box>

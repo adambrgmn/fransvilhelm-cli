@@ -46,7 +46,7 @@ const hasInstalledPackage = (
   packageJson?: PackageJson,
 ): boolean => {
   return (
-    packageJson?.dependencies?.[pkgName] != null &&
+    packageJson?.dependencies?.[pkgName] != null ||
     packageJson?.devDependencies?.[pkgName] != null
   );
 };

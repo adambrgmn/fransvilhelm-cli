@@ -29,7 +29,7 @@ export const useFolderContent = (absolutePath: string): FolderItem[] => {
         });
       }
 
-      if (isMounted())
+      if (isMounted()) {
         setItems(
           nextItems.sort((a, b) =>
             a.name.toLowerCase() > b.name.toLowerCase()
@@ -39,6 +39,7 @@ export const useFolderContent = (absolutePath: string): FolderItem[] => {
               : 0,
           ),
         );
+      }
     })();
   }, [absolutePath, isMounted]);
 

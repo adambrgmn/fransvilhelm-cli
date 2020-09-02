@@ -5,15 +5,13 @@ import { dirname, join } from 'path';
 import { merge, flatMap } from 'lodash';
 import { promisify } from 'util';
 import { Package } from './packages';
-import { TaskDefinition } from '../hooks/use-task-runner';
+import { Task } from '../hooks/use-tasks';
 import { unique, detectPackageManager, PackageManager } from '../utils';
 
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
-const packagesToTasks = async (
-  packages: Package[],
-): Promise<TaskDefinition[]> => {
+const packagesToTasks = async (packages: Package[]): Promise<Task[]> => {
   const packageJson = await readPkg();
   if (!packageJson) throw new Error('No package.json found for project');
 
@@ -26,7 +24,7 @@ const packagesToTasks = async (
     ),
   );
 
-  const installPackages: TaskDefinition = {
+  const installPackages: Task = {
     name: 'Install packages',
     description: 'Install dev dependencies',
     action: async () => {
@@ -45,7 +43,7 @@ const packagesToTasks = async (
     },
   };
 
-  const updatePackageJson: TaskDefinition = {
+  const updatePackageJson: Task = {
     name: 'Update package.json',
     description: 'Add configs to package.json',
     action: async () => {
@@ -99,7 +97,7 @@ const packagesToTasks = async (
     },
   };
 
-  const createConfigFiles: TaskDefinition = {
+  const createConfigFiles: Task = {
     name: 'Create config files',
     description: 'Write out config files',
     action: async () => {

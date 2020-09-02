@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Box, useApp } from 'ink';
+import { Box } from 'ink';
 import { MultiSelect } from '../lib/components/MultiSelect';
 import { Tasks } from '../lib/components/Tasks';
 import { Spinner } from '../lib/components/Spinner';
-import { TaskDefinition } from '../lib/hooks/use-task-runner';
 import { packages, Package } from '../lib/utils/packages';
 import { packagesToTasks } from '../lib/utils/packages-to-tasks';
+import { useTasks } from '../lib/hooks/use-tasks';
 
 enum States {
   SELECT,
@@ -16,8 +16,7 @@ enum States {
 /// Setup standard development environment
 const Setup: React.FC = () => {
   const [state, setState] = useState(States.SELECT);
-  const [tasks, setTasks] = useState<TaskDefinition[]>([]);
-  const { exit } = useApp();
+  const { addTask, runTasks, tasks } = useTasks();
 
   return (
     <Box width={process.stdout.columns}>
@@ -27,15 +26,15 @@ const Setup: React.FC = () => {
           choices={packages}
           onConfirm={async (choices: Package[]) => {
             setState(States.LOADING);
-            setTasks(await packagesToTasks(choices));
+            let newTasks = await packagesToTasks(choices);
+            for (let task of newTasks) addTask(task);
+            runTasks();
             setState(States.RUN_TASKS);
           }}
         />
       )}
       {state === States.LOADING && <Spinner name="dots" />}
-      {state === States.RUN_TASKS && (
-        <Tasks tasks={tasks} onDone={() => exit()} />
-      )}
+      {state === States.RUN_TASKS && <Tasks tasks={tasks} />}
     </Box>
   );
 };
