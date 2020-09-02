@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as path from 'path';
 import * as os from 'os';
 import { promises as fs } from 'fs';
@@ -26,7 +26,6 @@ const Dev: React.FC = () => {
   const [selectedProject, setSelectedProject] = useState<FolderItem>();
   const [folder, setFolder] = useState(initialFolder);
   const folderContent = useFolderContent(folder);
-  const hasOpenedRef = useRef(false);
 
   let message = 'Select project';
   if (folder.replace(initialFolder, '')) {
@@ -35,7 +34,7 @@ const Dev: React.FC = () => {
   }
 
   useEffect(() => {
-    if (selectedProject && !hasOpenedRef.current) {
+    if (selectedProject) {
       openProject(selectedProject).catch(() => {});
     }
   }, [selectedProject]);

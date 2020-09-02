@@ -29,7 +29,16 @@ export const useFolderContent = (absolutePath: string): FolderItem[] => {
         });
       }
 
-      if (isMounted()) setItems(nextItems);
+      if (isMounted())
+        setItems(
+          nextItems.sort((a, b) =>
+            a.name.toLowerCase() > b.name.toLowerCase()
+              ? 1
+              : a.name.toLowerCase() < b.name.toLowerCase()
+              ? -1
+              : 0,
+          ),
+        );
     })();
   }, [absolutePath, isMounted]);
 
