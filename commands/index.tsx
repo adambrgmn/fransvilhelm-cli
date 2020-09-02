@@ -1,7 +1,7 @@
 import React from 'react';
-import { Dev } from '../src/Dev';
+import Dev from './dev';
 
 /// Open dev projects
-const DevCommand = () => <Dev />;
+const Index = () => <Dev />;
 
-export default DevCommand;
+export default Index;

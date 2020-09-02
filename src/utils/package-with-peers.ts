@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { PackageJSON } from './packages';
+import { PackageJson } from 'read-pkg-up';
 
-const fetchPkgJson = async (pkg: string): Promise<PackageJSON> => {
-  const { data } = await axios.get<PackageJSON>(
+const fetchPkgJson = async (pkg: string): Promise<PackageJson> => {
+  const { data } = await axios.get<PackageJson>(
     `https://unpkg.com/${pkg}/package.json`,
   );
 
@@ -19,5 +19,5 @@ export const packageWithPeers = async (pkg: string): Promise<string[]> => {
     }),
   );
 
-  return [pkgConfig.name, ...peerDeps];
+  return [pkgConfig.name!, ...peerDeps];
 };

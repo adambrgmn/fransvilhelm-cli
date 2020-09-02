@@ -1,10 +1,10 @@
 import fs from 'fs';
 import execa from 'execa';
-import readPkg from 'read-pkg-up';
+import readPkg, { PackageJson } from 'read-pkg-up';
 import { dirname, join } from 'path';
 import { merge, flatMap } from 'lodash';
 import { promisify } from 'util';
-import { Package, PackageJSON } from './packages';
+import { Package } from './packages';
 import { TaskDefinition } from '../hooks/use-task-runner';
 import { unique, detectPackageManager, PackageManager } from '../utils';
 
@@ -15,11 +15,15 @@ const packagesToTasks = async (
   packages: Package[],
 ): Promise<TaskDefinition[]> => {
   const packageJson = await readPkg();
+  if (!packageJson) throw new Error('No package.json found for project');
+
   const pkgDir = packageJson.path ? dirname(packageJson.path) : process.cwd();
   const pkgPath = packageJson.path || join(process.cwd(), 'package.json');
 
   const configs = await Promise.all(
-    packages.map((p) => p.getConfig(packages, packageJson.pkg as PackageJSON)),
+    packages.map((p) =>
+      p.getConfig(packages, packageJson.packageJson as PackageJson),
+    ),
   );
 
   const installPackages: TaskDefinition = {
@@ -88,7 +92,10 @@ const packagesToTasks = async (
         return acc;
       }, {});
 
-      await writeFile(pkgPath, JSON.stringify(orderedPackageJson, null, 2));
+      await writeFile(
+        pkgPath,
+        JSON.stringify(orderedPackageJson, null, 2) + '\n',
+      );
     },
   };
 
@@ -104,6 +111,7 @@ const packagesToTasks = async (
       );
     },
   };
+
   return [installPackages, updatePackageJson, createConfigFiles];
 };
 

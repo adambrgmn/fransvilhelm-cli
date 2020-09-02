@@ -1,24 +1,9 @@
 import fs from 'fs';
 import { promisify } from 'util';
 import { join, dirname } from 'path';
-import readPkg from 'read-pkg-up';
+import readPkg, { PackageJson } from 'read-pkg-up';
 import { excludeFalse } from '../utils';
 import { packageWithPeers } from './package-with-peers';
-
-export interface PackageJSON {
-  name: string;
-  version: string;
-  dependencies: {
-    [packageName: string]: string;
-  };
-  devDependencies: {
-    [packageName: string]: string;
-  };
-  peerDependencies?: {
-    [packageName: string]: string;
-  };
-  [x: string]: any;
-}
 
 export interface ConfigFile {
   path: string;
@@ -33,7 +18,7 @@ export interface PackageConfig {
 
 export type GetConfigFn = (
   selectedPackages: Package[],
-  packageJson?: PackageJSON,
+  packageJson?: PackageJson,
 ) => PackageConfig | Promise<PackageConfig>;
 
 export interface Package {
@@ -58,7 +43,7 @@ const readAsset = async (filename: string): Promise<string> => {
 
 const hasInstalledPackage = (
   pkgName: string,
-  packageJson?: PackageJSON,
+  packageJson?: PackageJson,
 ): boolean => {
   return (
     packageJson?.dependencies?.[pkgName] != null &&

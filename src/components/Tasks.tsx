@@ -14,7 +14,7 @@ interface Props {
   onDone: (tasks: Task[]) => void;
 }
 
-const Idle = () => <Box> </Box>;
+const Idle = () => <Text> </Text>;
 
 const Pending = () => (
   <Box>
