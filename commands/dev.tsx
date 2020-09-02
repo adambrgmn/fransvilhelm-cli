@@ -6,8 +6,8 @@ import { Box, Text, useApp } from 'ink';
 import execa from 'execa';
 import which from 'which';
 import clipboard from 'clipboardy';
-import { useFolderContent, FolderItem } from '../src/hooks/useFolderContent';
-import { Select } from '../src/components/Select';
+import { useFolderContent, FolderItem } from '../lib/hooks/use-folder-content';
+import { Select } from '../lib/components/Select';
 
 const isProject = async (folderPath: string): Promise<boolean> => {
   let content = await fs.readdir(folderPath);

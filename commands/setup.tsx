@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Box, useApp } from 'ink';
-import { MultiSelect } from '../src/components/MultiSelect';
-import { Tasks } from '../src/components/Tasks';
-import { Spinner } from '../src/components/Spinner';
-import { TaskDefinition } from '../src/hooks/use-task-runner';
-import { packages, Package } from '../src/utils/packages';
-import { packagesToTasks } from '../src/utils/packages-to-tasks';
+import { MultiSelect } from '../lib/components/MultiSelect';
+import { Tasks } from '../lib/components/Tasks';
+import { Spinner } from '../lib/components/Spinner';
+import { TaskDefinition } from '../lib/hooks/use-task-runner';
+import { packages, Package } from '../lib/utils/packages';
+import { packagesToTasks } from '../lib/utils/packages-to-tasks';
 
 enum States {
   SELECT,
