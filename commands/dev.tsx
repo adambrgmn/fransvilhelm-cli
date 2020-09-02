@@ -23,7 +23,7 @@ const openProject = async (project: FolderItem) => {
 let initialFolder = path.join(os.homedir(), '/Development');
 
 /// Open dev projects
-const Dev: React.FC = () => {
+const Dev = () => {
   const [selectedProject, setSelectedProject] = useState<FolderItem>();
   const [folder, setFolder] = useState(initialFolder);
   const folderContent = useFolderContent(folder);

@@ -6,24 +6,13 @@ import {
   Interpreter,
   send,
   sendParent,
-  State,
 } from 'xstate';
 import { useMachine } from '@xstate/react';
-import { useCallback } from 'react';
 
 export type Task = {
   name: string;
   description: string;
   action: () => Promise<any>;
-};
-
-type TaskSchema = {
-  states: {
-    idle: {};
-    pending: {};
-    rejected: {};
-    resolved: {};
-  };
 };
 
 type TaskEvent = { type: 'INIT' };
@@ -39,7 +28,12 @@ type TaskState =
   | { value: 'rejected'; context: { description: string; error: string } }
   | { value: 'resolved'; context: { description: string } };
 
-export type TaskInterpreter = Interpreter<TaskContext, TaskSchema, TaskEvent>;
+export type TaskInterpreter = Interpreter<
+  TaskContext,
+  any,
+  TaskEvent,
+  TaskState
+>;
 
 export const taskMachine = createMachine<TaskContext, TaskEvent, TaskState>(
   {
@@ -63,8 +57,8 @@ export const taskMachine = createMachine<TaskContext, TaskEvent, TaskState>(
           },
         },
       },
-      rejected: { type: 'final', entry: sendParent('DONE') },
-      resolved: { type: 'final', entry: sendParent('DONE') },
+      rejected: { type: 'final', entry: sendParent('REJECTED') },
+      resolved: { type: 'final', entry: sendParent('RESOLVED') },
     },
   },
   {
@@ -76,28 +70,46 @@ export const taskMachine = createMachine<TaskContext, TaskEvent, TaskState>(
   },
 );
 
-type TaskManagerContext = {
+export type TaskManagerContext = {
   tasks: TaskInterpreter[];
+  failOnRejected: boolean;
 };
 
 type TaskManagerEvent =
   | { type: 'NEW_TASK'; task: Task }
   | { type: 'INIT' }
-  | { type: 'DONE' };
+  | { type: 'RESOLVED' }
+  | { type: 'REJECTED' };
 
 type TaskManagerState =
   | {
       value: 'idle';
-      context: { tasks: TaskInterpreter[] };
+      context: { tasks: TaskInterpreter[]; failOnRejected: boolean };
     }
   | {
       value: 'pending';
-      context: { tasks: TaskInterpreter[] };
+      context: { tasks: TaskInterpreter[]; failOnRejected: boolean };
     }
   | {
       value: 'done';
-      context: { tasks: TaskInterpreter[] };
+      context: { tasks: TaskInterpreter[]; failOnRejected: boolean };
     };
+
+const defaultContext: TaskManagerContext = {
+  tasks: [],
+  failOnRejected: false,
+};
+
+const initChild = send<TaskManagerContext, any, any>(
+  { type: 'INIT' },
+  {
+    // @ts-ignore
+    to: (context) =>
+      context.tasks.find((task) =>
+        task.state.matches('idle'),
+      ) as TaskInterpreter,
+  },
+);
 
 export const taskManagerMachine = createMachine<
   TaskManagerContext,
@@ -108,9 +120,7 @@ export const taskManagerMachine = createMachine<
     id: 'task-manager',
     initial: 'idle',
     strict: true,
-    context: {
-      tasks: [],
-    },
+    context: defaultContext,
     states: {
       idle: {
         on: {
@@ -133,31 +143,23 @@ export const taskManagerMachine = createMachine<
         },
       },
       pending: {
-        entry: send(
-          { type: 'INIT' },
-          {
-            // @ts-ignore
-            to: (context) =>
-              context.tasks.find((task) =>
-                task.state.matches('idle'),
-              ) as TaskInterpreter,
-          },
-        ),
+        entry: initChild,
         on: {
-          DONE: [
+          RESOLVED: [
             {
               cond: 'hasIdleTask',
-              internal: true,
-              actions: send(
-                { type: 'INIT' },
-                {
-                  // @ts-ignore
-                  to: (context) =>
-                    context.tasks.find((task) =>
-                      task.state.matches('idle'),
-                    ) as TaskInterpreter,
-                },
-              ),
+              actions: initChild,
+            },
+            { target: 'done' },
+          ],
+          REJECTED: [
+            {
+              cond: 'failOnRejected',
+              target: 'done',
+            },
+            {
+              cond: 'hasIdleTask',
+              actions: initChild,
             },
             { target: 'done' },
           ],
@@ -173,10 +175,13 @@ export const taskManagerMachine = createMachine<
           context.tasks.findIndex((task) => task.state.matches('idle')) > -1
         );
       },
+      failOnRejected: (context) => context.failOnRejected,
     },
   },
 );
 
-export function useTasks() {
-  return useMachine(taskManagerMachine);
+export function useTasks(ctx?: Partial<TaskManagerContext>) {
+  return useMachine(
+    taskManagerMachine.withContext({ ...defaultContext, ...ctx }),
+  );
 }
