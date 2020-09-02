@@ -9,14 +9,15 @@ const fetchPkgJson = async (pkg: string): Promise<PackageJson> => {
   return data;
 };
 
-export const packageWithPeers = async (pkg: string): Promise<string[]> => {
+export const getPeerDependecies = async (pkg: string): Promise<string[]> => {
   let pkgConfig = await fetchPkgJson(pkg);
   let peerDeps = await Promise.all(
-    Object.entries(pkgConfig.peerDependencies ?? {}).map(([peer, version]) => {
-      return fetchPkgJson(`${peer}@${version}`).then(
-        (peerConfig) => `${peerConfig.name}@^${peerConfig.version}`,
-      );
-    }),
+    Object.entries(pkgConfig.peerDependencies ?? {}).map(
+      async ([peer, version]) => {
+        const peerConfig = await fetchPkgJson(`${peer}@${version}`);
+        return `${peerConfig.name}@^${peerConfig.version}`;
+      },
+    ),
   );
 
   return [pkgConfig.name!, ...peerDeps];

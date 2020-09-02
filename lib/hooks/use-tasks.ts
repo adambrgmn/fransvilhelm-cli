@@ -6,6 +6,7 @@ import {
   Interpreter,
   send,
   sendParent,
+  State,
 } from 'xstate';
 import { useMachine } from '@xstate/react';
 import { useCallback } from 'react';
@@ -177,14 +178,5 @@ export const taskManagerMachine = createMachine<
 );
 
 export function useTasks() {
-  const [state, send] = useMachine(taskManagerMachine);
-
-  const addTask = useCallback(
-    (task: Task) => send({ type: 'NEW_TASK', task }),
-    [send],
-  );
-
-  const runTasks = useCallback(() => send('INIT'), [send]);
-
-  return { addTask, runTasks, tasks: state.context.tasks };
+  return useMachine(taskManagerMachine);
 }

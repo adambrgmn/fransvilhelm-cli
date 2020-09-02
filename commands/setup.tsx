@@ -1,40 +1,31 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box } from 'ink';
 import { MultiSelect } from '../lib/components/MultiSelect';
 import { Tasks } from '../lib/components/Tasks';
-import { Spinner } from '../lib/components/Spinner';
-import { packages, Package } from '../lib/utils/packages';
-import { packagesToTasks } from '../lib/utils/packages-to-tasks';
+import { packages } from '../lib/utils/packages/available-packages';
+import { packagesToTasks } from '../lib/utils/packages/packages-to-tasks';
 import { useTasks } from '../lib/hooks/use-tasks';
-
-enum States {
-  SELECT,
-  RUN_TASKS,
-  LOADING,
-}
 
 /// Setup standard development environment
 const Setup: React.FC = () => {
-  const [state, setState] = useState(States.SELECT);
-  const { addTask, runTasks, tasks } = useTasks();
+  const [state, send] = useTasks();
 
   return (
-    <Box width={process.stdout.columns}>
-      {state === States.SELECT && (
+    <Box width="100%">
+      {state.matches('idle') && (
         <MultiSelect
           message="Select packages to setup and confirm with <enter>"
           choices={packages}
-          onConfirm={async (choices: Package[]) => {
-            setState(States.LOADING);
-            let newTasks = await packagesToTasks(choices);
-            for (let task of newTasks) addTask(task);
-            runTasks();
-            setState(States.RUN_TASKS);
+          onConfirm={async (choices) => {
+            let newTasks = packagesToTasks(choices);
+            for (let task of newTasks) send({ type: 'NEW_TASK', task });
+            send({ type: 'INIT' });
           }}
         />
       )}
-      {state === States.LOADING && <Spinner name="dots" />}
-      {state === States.RUN_TASKS && <Tasks tasks={tasks} />}
+      {(state.matches('pending') || state.matches('done')) && (
+        <Tasks tasks={state.context.tasks} />
+      )}
     </Box>
   );
 };
