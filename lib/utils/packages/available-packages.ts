@@ -184,20 +184,6 @@ const typescript: PackageConfig = {
   ],
 };
 
-const commitizen: PackageConfig = {
-  name: 'commitizen',
-  description: 'With cz-conventional-changelog',
-  getDependencies: {
-    dependencies: [],
-    devDependencies: ['cz-conventional-changelog'],
-  },
-  getPackageJson: {
-    config: {
-      commitizen: { path: 'cz-conventional-changelog' },
-    },
-  },
-};
-
 const semanticRelease: PackageConfig = {
   name: 'semantic-release',
   description: 'With basic Travis CI config',
@@ -224,7 +210,6 @@ export const packages: PackageConfig[] = [
   lintStaged,
   prettier,
   typescript,
-  commitizen,
   semanticRelease,
 ];
 
