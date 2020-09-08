@@ -217,17 +217,6 @@ const semanticRelease: PackageConfig = {
   ],
 };
 
-const netlify: PackageConfig = {
-  name: 'netlify',
-  description: 'With basic SPA config',
-  getFiles: [
-    {
-      template: 'assets/netlify.toml',
-      output: 'netlify.toml',
-    },
-  ],
-};
-
 export const packages: PackageConfig[] = [
   eslint,
   jest,
@@ -237,7 +226,6 @@ export const packages: PackageConfig[] = [
   typescript,
   commitizen,
   semanticRelease,
-  netlify,
 ];
 
 // ------- Utils
