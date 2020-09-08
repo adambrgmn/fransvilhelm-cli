@@ -5,23 +5,23 @@
 
 
 
-- [`a559242`](https://github.com/adambrgmn/fransvilhelm-cli/commit/a5592423fd05de60704a3a436c0e21cf73486723) [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1) Thanks [@adambrgmn](https://github.com/adambrgmn)! - Initial major release
+- Initial major release (by [@adambrgmn](https://github.com/adambrgmn) in [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1))
 
 
 ### Minor Changes
 
 
 
-- [`a559242`](https://github.com/adambrgmn/fransvilhelm-cli/commit/a5592423fd05de60704a3a436c0e21cf73486723) [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1) Thanks [@adambrgmn](https://github.com/adambrgmn)! - Add changesets package
+- Add changesets package (by [@adambrgmn](https://github.com/adambrgmn) in [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1))
 
 
 
-- [`a559242`](https://github.com/adambrgmn/fransvilhelm-cli/commit/a5592423fd05de60704a3a436c0e21cf73486723) [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1) Thanks [@adambrgmn](https://github.com/adambrgmn)! - Drop commitizen package
+- Drop commitizen package (by [@adambrgmn](https://github.com/adambrgmn) in [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1))
 
 
 
-- [`a559242`](https://github.com/adambrgmn/fransvilhelm-cli/commit/a5592423fd05de60704a3a436c0e21cf73486723) [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1) Thanks [@adambrgmn](https://github.com/adambrgmn)! - Drop netlify package
+- Drop netlify package (by [@adambrgmn](https://github.com/adambrgmn) in [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1))
 
 
 
-- [`a559242`](https://github.com/adambrgmn/fransvilhelm-cli/commit/a5592423fd05de60704a3a436c0e21cf73486723) [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1) Thanks [@adambrgmn](https://github.com/adambrgmn)! - Drop Semantic Release package
+- Drop Semantic Release package (by [@adambrgmn](https://github.com/adambrgmn) in [#1](https://github.com/adambrgmn/fransvilhelm-cli/pull/1))
