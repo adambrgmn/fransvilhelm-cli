@@ -184,6 +184,24 @@ const typescript: PackageConfig = {
   ],
 };
 
+const changesets: PackageConfig = {
+  name: 'changesets',
+  description: 'Setup changesets with GitHub actions',
+  getDependencies: { dependencies: [], devDependencies: ['@changesets/cli'] },
+  getPackageJson: {
+    scripts: {
+      release: 'yarn build && yarn changeset publish',
+    },
+  },
+  getFiles: [
+    {
+      template: 'assets/changeset-action.yml',
+      output: '.github/workflows/release.yml',
+    },
+  ],
+  postSetupScripts: [['yarn', 'changeset', 'init']],
+};
+
 export const packages: PackageConfig[] = [
   eslint,
   jest,
@@ -191,6 +209,7 @@ export const packages: PackageConfig[] = [
   lintStaged,
   prettier,
   typescript,
+  changesets,
 ];
 
 // ------- Utils

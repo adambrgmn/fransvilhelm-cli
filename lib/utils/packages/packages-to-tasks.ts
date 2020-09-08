@@ -143,13 +143,38 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
             join(cliBase, fileConfig.template),
             'utf-8',
           );
+
+          await fs.mkdir(dirname(fileConfig.output), { recursive: true });
           await fs.writeFile(join(projectBase, fileConfig.output), content);
         }),
       );
     },
   };
 
-  return [installDependencies, updatePackageJson, createConfigFiles];
+  let runPostSetupScripts: Task = {
+    name: 'Run post setup scripts',
+    description: 'Run necessary scripts',
+    action: async () => {
+      let { packageJson, path } = await readPkgSafe();
+      let allScripts = (
+        await getConfig(selectedPackages, 'postSetupScripts', {
+          packageJson,
+          selectedPackages,
+        })
+      ).flat(1);
+
+      for (let [program, ...args] of allScripts) {
+        await execa(program, args, { cwd: dirname(path) });
+      }
+    },
+  };
+
+  return [
+    installDependencies,
+    updatePackageJson,
+    createConfigFiles,
+    runPostSetupScripts,
+  ];
 };
 
 async function readPkgSafe(
@@ -180,7 +205,12 @@ async function getConfig(
 ): Promise<Files[][]>;
 async function getConfig(
   selectedPackages: PackageConfig[],
-  key: 'getDependencies' | 'getPackageJson' | 'getFiles',
+  key: 'postSetupScripts',
+  params: PackageMethodParams,
+): Promise<string[][][]>;
+async function getConfig(
+  selectedPackages: PackageConfig[],
+  key: keyof Omit<PackageConfig, 'name' | 'description'>,
   params: PackageMethodParams,
 ) {
   let result = await Promise.all(

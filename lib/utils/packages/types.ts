@@ -26,4 +26,5 @@ export interface PackageConfig {
   getDependencies?: PackageMethod<Dependecies>;
   getFiles?: PackageMethod<Files[]>;
   getPackageJson?: PackageMethod<Partial<PackageJson>>;
+  postSetupScripts?: PackageMethod<string[][]>;
 }
