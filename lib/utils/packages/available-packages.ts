@@ -184,48 +184,22 @@ const typescript: PackageConfig = {
   ],
 };
 
-const commitizen: PackageConfig = {
-  name: 'commitizen',
-  description: 'With cz-conventional-changelog',
-  getDependencies: {
-    dependencies: [],
-    devDependencies: ['cz-conventional-changelog'],
-  },
+const changesets: PackageConfig = {
+  name: 'changesets',
+  description: 'Setup changesets with GitHub actions',
+  getDependencies: { dependencies: [], devDependencies: ['@changesets/cli'] },
   getPackageJson: {
-    config: {
-      commitizen: { path: 'cz-conventional-changelog' },
+    scripts: {
+      release: 'yarn build && yarn changeset publish',
     },
-  },
-};
-
-const semanticRelease: PackageConfig = {
-  name: 'semantic-release',
-  description: 'With basic Travis CI config',
-  getDependencies: {
-    dependencies: [],
-    devDependencies: ['semantic-release'],
-  },
-  getPackageJson: {
-    scripts: { 'semantic-release': 'semantic-release' },
-    publishConfig: { access: 'public' },
   },
   getFiles: [
     {
-      template: 'assets/.travis.yml',
-      output: '.travis.yml',
+      template: 'assets/changeset-action.yml',
+      output: '.github/workflows/release.yml',
     },
   ],
-};
-
-const netlify: PackageConfig = {
-  name: 'netlify',
-  description: 'With basic SPA config',
-  getFiles: [
-    {
-      template: 'assets/netlify.toml',
-      output: 'netlify.toml',
-    },
-  ],
+  postSetupScripts: [['yarn', 'changeset', 'init']],
 };
 
 export const packages: PackageConfig[] = [
@@ -235,9 +209,7 @@ export const packages: PackageConfig[] = [
   lintStaged,
   prettier,
   typescript,
-  commitizen,
-  semanticRelease,
-  netlify,
+  changesets,
 ];
 
 // ------- Utils
