@@ -11,13 +11,13 @@
     "assets"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=12"
   },
   "scripts": {
     "dev": "pastel dev",
     "build": "pastel build",
-    "cli": "./build/cli.js",
-    "test": "jest"
+    "test": "jest",
+    "release": "yarn build && changeset publish"
   },
   "dependencies": {
     "@fransvilhelm/hooks": "^2.0.1",
