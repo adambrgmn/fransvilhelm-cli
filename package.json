@@ -1,8 +1,14 @@
 {
   "name": "@fransvilhelm/cli",
   "version": "0.0.0",
-  "main": "./build/cli.js",
   "license": "MIT",
+  "repository": "git@github.com:adambrgmn/fransvilhelm-cli.git",
+  "author": {
+    "name": "Adam Bergman",
+    "email": "adam@fransvilhelm.com"
+  },
+  "homepage": "https://github.com/adambrgmn/fransvilhelm-cli",
+  "main": "./build/cli.js",
   "bin": {
     "frans": "./build/cli.js"
   },
