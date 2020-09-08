@@ -184,25 +184,6 @@ const typescript: PackageConfig = {
   ],
 };
 
-const semanticRelease: PackageConfig = {
-  name: 'semantic-release',
-  description: 'With basic Travis CI config',
-  getDependencies: {
-    dependencies: [],
-    devDependencies: ['semantic-release'],
-  },
-  getPackageJson: {
-    scripts: { 'semantic-release': 'semantic-release' },
-    publishConfig: { access: 'public' },
-  },
-  getFiles: [
-    {
-      template: 'assets/.travis.yml',
-      output: '.travis.yml',
-    },
-  ],
-};
-
 export const packages: PackageConfig[] = [
   eslint,
   jest,
@@ -210,7 +191,6 @@ export const packages: PackageConfig[] = [
   lintStaged,
   prettier,
   typescript,
-  semanticRelease,
 ];
 
 // ------- Utils
