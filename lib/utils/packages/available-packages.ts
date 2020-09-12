@@ -1,4 +1,5 @@
 import { PackageJson } from 'read-pkg-up';
+
 import { excludeEmpty } from '../../utils';
 import { getPeerDependecies } from './get-peer-dependecies';
 import { PackageConfig } from './types';

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import figures from 'figures';
-import { Choice } from './MultiSelect';
 import { Box, Text, useInput } from 'ink';
+
+import { Choice } from './MultiSelect';
 import { SelectFAQ, FaqItem } from './SelectFaq';
 
 interface Props<C extends Choice> {

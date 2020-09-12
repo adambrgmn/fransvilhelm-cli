@@ -24,6 +24,7 @@
     "build": "pastel build",
     "build:tools": "babel tools --out-dir build/tools --extensions '.ts,.tsx'",
     "test": "jest",
+    "lint": "eslint . --ext .ts --ext .tsx --ext .js",
     "release": "yarn build && changeset publish"
   },
   "dependencies": {
@@ -87,7 +88,25 @@
     "access": "public"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "import/order": [
+        "warn",
+        {
+          "newlines-between": "always",
+          "groups": [
+            "builtin",
+            "external",
+            "internal",
+            [
+              "parent",
+              "sibling",
+              "index"
+            ]
+          ]
+        }
+      ]
+    }
   },
   "husky": {
     "hooks": {
