@@ -39,7 +39,7 @@ jobs:
         run: yarn type-check
 
       - name: Test
-        run: yarn test --coverage
+        run: yarn test
 
       - name: Build
         run: yarn build
