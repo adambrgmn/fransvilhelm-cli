@@ -194,6 +194,11 @@ const typescript: PackageConfig = {
       ].filter(excludeEmpty),
     };
   },
+  getPackageJson: {
+    scripts: {
+      'type-check': 'tsc --noEmit',
+    },
+  },
   getFiles: [
     {
       template: 'assets/tsconfig.json',
@@ -205,7 +210,10 @@ const typescript: PackageConfig = {
 const changesets: PackageConfig = {
   name: 'changesets',
   description: 'Setup changesets with GitHub actions',
-  getDependencies: { dependencies: [], devDependencies: ['@changesets/cli'] },
+  getDependencies: {
+    dependencies: [],
+    devDependencies: ['@changesets/cli', '@fransvilhelm/changeset-changelog'],
+  },
   getPackageJson: {
     scripts: {
       release: 'yarn build && yarn changeset publish',
@@ -213,11 +221,25 @@ const changesets: PackageConfig = {
   },
   getFiles: [
     {
+      template: 'assets/changeset-config.json.hbs',
+      output: '.changeset/config.json',
+    },
+    {
       template: 'assets/changeset-action.yml',
       output: '.github/workflows/release.yml',
     },
   ],
-  postSetupScripts: [['yarn', 'changeset', 'init']],
+};
+
+const pr: PackageConfig = {
+  name: 'pr',
+  description: 'PR workflow',
+  getFiles: [
+    {
+      template: 'assets/pr-workflow.yml',
+      output: '.github/workflows/pr.yml',
+    },
+  ],
 };
 
 export const packages: PackageConfig[] = [
@@ -228,6 +250,7 @@ export const packages: PackageConfig[] = [
   prettier,
   typescript,
   changesets,
+  pr,
 ];
 
 // ------- Utils

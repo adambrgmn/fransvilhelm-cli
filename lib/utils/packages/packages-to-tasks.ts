@@ -4,12 +4,14 @@ import { dirname, join } from 'path';
 import readPkgUp, { PackageJson } from 'read-pkg-up';
 import execa from 'execa';
 import { uniq, merge } from 'lodash';
+import Handlebars from 'handlebars';
 
 import { Task } from '../../hooks/use-tasks';
 import {
   detectPackageManager,
   PackageManager,
   excludeEmpty,
+  extractGithubRepo,
 } from '../../utils';
 import {
   PackageConfig,
@@ -136,15 +138,26 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
         })
       ).flat();
 
+      let github: { user: string; repo: string } | void;
+      if (typeof packageJson.repository === 'string') {
+        github = extractGithubRepo(packageJson.repository);
+      } else if (packageJson.repository != null) {
+        github = extractGithubRepo(packageJson.repository.url);
+      }
+
       let projectBase = dirname(path);
       let cliBase = dirname(cli.path);
-
       await Promise.all(
         allFiles.map(async (fileConfig) => {
           let content = await fs.readFile(
             join(cliBase, fileConfig.template),
             'utf-8',
           );
+
+          if (fileConfig.template.includes('.hbs')) {
+            let template = Handlebars.compile(content);
+            content = template({ pkg: packageJson, github });
+          }
 
           await fs.mkdir(dirname(fileConfig.output), { recursive: true });
           await fs.writeFile(join(projectBase, fileConfig.output), content);
