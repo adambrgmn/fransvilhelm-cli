@@ -226,6 +226,17 @@ const changesets: PackageConfig = {
   ],
 };
 
+const pr: PackageConfig = {
+  name: 'pr',
+  description: 'PR workflow',
+  getFiles: [
+    {
+      template: 'assets/pr-workflow.yml',
+      output: '.github/workflows/pr.yml',
+    },
+  ],
+};
+
 export const packages: PackageConfig[] = [
   eslint,
   jest,
@@ -234,6 +245,7 @@ export const packages: PackageConfig[] = [
   prettier,
   typescript,
   changesets,
+  pr,
 ];
 
 // ------- Utils
