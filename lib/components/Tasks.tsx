@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import figures from 'figures';
+
 import { TaskInterpreter } from '../hooks/use-tasks';
 import { Spinner } from './Spinner';
 

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
 import * as path from 'path';
 import * as os from 'os';
 import { promises as fs } from 'fs';
+
+import React, { useState, useEffect } from 'react';
 import { Box, Text, useApp } from 'ink';
 import execa from 'execa';
 import which from 'which';
 import clipboard from 'clipboardy';
+
 import { useFolderContent, FolderItem } from '../lib/hooks/use-folder-content';
 import { Select } from '../lib/components/Select';
 

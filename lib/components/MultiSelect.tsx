@@ -1,6 +1,7 @@
 import React, { useReducer, Reducer } from 'react';
 import { Box, Text, useInput } from 'ink';
 import figures from 'figures';
+
 import { SelectFAQ, FaqItem } from './SelectFaq';
 
 export interface Choice {

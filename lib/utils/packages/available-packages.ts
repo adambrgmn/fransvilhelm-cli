@@ -1,4 +1,5 @@
 import { PackageJson } from 'read-pkg-up';
+
 import { excludeEmpty } from '../../utils';
 import { getPeerDependecies } from './get-peer-dependecies';
 import { PackageConfig } from './types';
@@ -30,8 +31,25 @@ const eslint: PackageConfig = {
     };
   },
   getPackageJson: () => ({
+    scripts: {
+      lint: 'eslint . --ext .ts --ext .tsx --ext .js',
+    },
     eslintConfig: {
       extends: 'react-app',
+      rules: {
+        'import/order': [
+          'warn',
+          {
+            'newlines-between': 'always',
+            groups: [
+              'builtin',
+              'external',
+              'internal',
+              ['parent', 'sibling', 'index'],
+            ],
+          },
+        ],
+      },
     },
   }),
 };

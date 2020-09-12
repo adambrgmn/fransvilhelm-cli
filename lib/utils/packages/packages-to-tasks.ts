@@ -1,8 +1,10 @@
 import { promises as fs } from 'fs';
 import { dirname, join } from 'path';
+
 import readPkgUp, { PackageJson } from 'read-pkg-up';
 import execa from 'execa';
 import { uniq, merge } from 'lodash';
+
 import { Task } from '../../hooks/use-tasks';
 import {
   detectPackageManager,
