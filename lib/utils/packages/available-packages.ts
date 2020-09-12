@@ -194,6 +194,11 @@ const typescript: PackageConfig = {
       ].filter(excludeEmpty),
     };
   },
+  getPackageJson: {
+    scripts: {
+      'type-check': 'tsc --noEmit',
+    },
+  },
   getFiles: [
     {
       template: 'assets/tsconfig.json',
