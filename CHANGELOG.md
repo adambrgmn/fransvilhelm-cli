@@ -1,5 +1,29 @@
 # @fransvilhelm/cli
 
+## 1.1.0
+
+### Minor Changes
+
+- Add lint script in eslint package (by
+  [@adambrgmn](https://github.com/adambrgmn) in
+  [#8](https://github.com/adambrgmn/fransvilhelm-cli/pull/8))
+- Add import/order rule to eslint package (by
+  [@adambrgmn](https://github.com/adambrgmn) in
+  [#8](https://github.com/adambrgmn/fransvilhelm-cli/pull/8))
+- Update changeset config (by [@adambrgmn](https://github.com/adambrgmn) in
+  [#10](https://github.com/adambrgmn/fransvilhelm-cli/pull/10))
+- Add PR workflow setup option (by [@adambrgmn](https://github.com/adambrgmn) in
+  [#10](https://github.com/adambrgmn/fransvilhelm-cli/pull/10))
+
+### Patch Changes
+
+- Add type-check script to typescript package (by
+  [@adambrgmn](https://github.com/adambrgmn) in
+  [#10](https://github.com/adambrgmn/fransvilhelm-cli/pull/10))
+- Update babelrc config to work better with jest (by
+  [@adambrgmn](https://github.com/adambrgmn) in
+  [#10](https://github.com/adambrgmn/fransvilhelm-cli/pull/10))
+
 ## 1.0.1
 
 ### Patch Changes
