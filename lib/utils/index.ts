@@ -80,3 +80,19 @@ export const detectPackageManager = async (): Promise<PackageManager> => {
     'Could not detect package manager. Neither yarn or npm seems to exist',
   );
 };
+
+export const extractGithubRepo = (
+  repoUrl: string,
+): { user: string; repo: string } | void => {
+  try {
+    if (!repoUrl.endsWith('.git')) return;
+
+    let match = repoUrl.match(/(\w|-|_)+\/(\w|-|_)+\.git$/);
+    if (match == null) return;
+    const [user, repo] = match[0].replace('.git', '').split('/');
+
+    return { user, repo };
+  } catch (error) {
+    return;
+  }
+};

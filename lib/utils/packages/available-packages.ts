@@ -216,8 +216,8 @@ const changesets: PackageConfig = {
   },
   getFiles: [
     {
-      template: 'assets/changeset-config.json',
-      output: '.changeset/config.js',
+      template: 'assets/changeset-config.json.hbs',
+      output: '.changeset/config.json',
     },
     {
       template: 'assets/changeset-action.yml',
