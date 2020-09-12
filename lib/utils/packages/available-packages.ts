@@ -205,7 +205,10 @@ const typescript: PackageConfig = {
 const changesets: PackageConfig = {
   name: 'changesets',
   description: 'Setup changesets with GitHub actions',
-  getDependencies: { dependencies: [], devDependencies: ['@changesets/cli'] },
+  getDependencies: {
+    dependencies: [],
+    devDependencies: ['@changesets/cli', '@fransvilhelm/changeset-changelog'],
+  },
   getPackageJson: {
     scripts: {
       release: 'yarn build && yarn changeset publish',
@@ -213,11 +216,14 @@ const changesets: PackageConfig = {
   },
   getFiles: [
     {
+      template: 'assets/changeset-config.json',
+      output: '.changeset/config.js',
+    },
+    {
       template: 'assets/changeset-action.yml',
       output: '.github/workflows/release.yml',
     },
   ],
-  postSetupScripts: [['yarn', 'changeset', 'init']],
 };
 
 export const packages: PackageConfig[] = [
