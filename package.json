@@ -1,6 +1,6 @@
 {
   "name": "@fransvilhelm/cli",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "main": "./build/cli.js",
   "repository": "git@github.com/adambrgmn/fransvilhelm-cli.git",
   "author": {
