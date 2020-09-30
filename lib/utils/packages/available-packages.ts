@@ -207,6 +207,23 @@ const typescript: PackageConfig = {
   ],
 };
 
+const microbundle: PackageConfig = {
+  name: 'microbundle',
+  description: 'Setup microbundle basics',
+  getDependencies: {
+    dependencies: [],
+    devDependencies: ['microbundle'],
+  },
+  getPackageJson: {
+    source: 'src/index.ts',
+    main: 'dist/{{pkg.name}}.js',
+    'umd:main': 'dist/{{pkg.name}}.umd.js',
+    module: 'dist/{{pkg.name}}.esm.js',
+    esmodule: 'dist/{{pkg.name}}.modern.js',
+    types: 'dist/{{pkg.name}}.d.ts',
+  },
+};
+
 const changesets: PackageConfig = {
   name: 'changesets',
   description: 'Setup changesets with GitHub actions',
@@ -249,6 +266,7 @@ export const packages: PackageConfig[] = [
   lintStaged,
   prettier,
   typescript,
+  microbundle,
   changesets,
   pr,
 ];
