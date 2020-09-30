@@ -33,8 +33,7 @@ const Dev = () => {
 
   let message = 'Select project';
   if (folder.replace(initialFolder, '')) {
-    message +=
-      ' (' + folder.replace(initialFolder, '').replace(/^\//, '') + ')';
+    message += ' (' + folder.replace(initialFolder + '/', '') + ')';
   }
 
   useEffect(() => {
@@ -58,6 +57,12 @@ const Dev = () => {
             }
 
             return setFolder(choice.fullPath);
+          }}
+          onCancel={() => {
+            setFolder((current) => {
+              if (current === initialFolder) return current;
+              return path.dirname(current);
+            });
           }}
         />
       )}
