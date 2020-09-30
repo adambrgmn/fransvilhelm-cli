@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import figures from 'figures';
 import { Box, Text, useInput } from 'ink';
+import matchSorter from 'match-sorter';
 
 import { Choice } from './MultiSelect';
 import { SelectFAQ, FaqItem } from './SelectFaq';
@@ -9,14 +10,24 @@ interface Props<C extends Choice> {
   choices: C[];
   message: string;
   onSelect: (choice: C) => void;
+  onCancel?: () => void;
 }
 
 export const Select = <C extends Choice>({
   choices,
   message,
   onSelect,
+  onCancel,
 }: Props<C>) => {
   const [index, setIndex] = useState(0);
+  const [search, setSearch] = useState('');
+
+  const matchedChoices = useMemo(() => {
+    if (search.length === 0) return choices;
+    return matchSorter(choices, search, { keys: ['name'] });
+  }, [choices, search]);
+
+  let maxIndex = matchedChoices.length - 1;
 
   useInput((input, key) => {
     let nextIndex: number;
@@ -24,27 +35,27 @@ export const Select = <C extends Choice>({
       case key.downArrow:
       case key.rightArrow:
         nextIndex = index + 1;
-        return setIndex(nextIndex > choices.length - 1 ? 0 : nextIndex);
+        return setIndex(nextIndex > maxIndex ? 0 : nextIndex);
       case key.upArrow:
       case key.leftArrow:
         nextIndex = index - 1;
-        return setIndex(nextIndex < 0 ? choices.length - 1 : nextIndex);
+        return setIndex(nextIndex < 0 ? maxIndex : nextIndex);
       case key.return:
-        let choice = choices[index];
+        let choice = matchedChoices[index];
         return onSelect(choice);
+      case key.backspace:
+      case key.delete:
+        if (search.length > 0) setSearch(search.slice(0, -1));
+        else if (onCancel) onCancel();
+        break;
       default:
-        if (input.length === 1) {
-          let idx = choices.findIndex(
-            (item) => item.name.toLowerCase()[0] === input,
-          );
-          if (idx > -1) setIndex(idx);
-        }
+        setSearch((s) => s + input.toLowerCase());
     }
   });
 
   useEffect(() => {
-    if (index !== 0 && index > choices.length - 1) setIndex(choices.length - 1);
-  }, [choices, index]);
+    setIndex((i) => Math.max(0, Math.min(i, maxIndex)));
+  }, [maxIndex]);
 
   const faq: FaqItem[] = [
     ['Traverse:', 'Arrow keys'],
@@ -60,11 +71,12 @@ export const Select = <C extends Choice>({
         </Box>
         <Box>
           <Text>{message}</Text>
+          <Text color="gray"> {search}</Text>
         </Box>
       </Box>
 
       <Box marginBottom={1} flexDirection="column">
-        {choices.map((choice, idx) => (
+        {matchedChoices.map((choice, idx) => (
           <Box key={choice.name}>
             <Box marginRight={1} marginLeft={1}>
               <Text wrap="truncate">
