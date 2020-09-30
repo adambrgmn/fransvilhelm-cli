@@ -31,11 +31,10 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
       let install = packageManager === PackageManager.npm ? 'install' : 'add';
       let dev = packageManager === PackageManager.npm ? '--save-dev' : '--dev';
 
-      let allDependecies = await getConfig(
+      let allDependecies = await getConfig('getDependencies', {
+        packageJson,
         selectedPackages,
-        'getDependencies',
-        { packageJson, selectedPackages },
-      );
+      });
 
       let deps: Dependecies = {
         dependencies: [],
@@ -69,7 +68,7 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
     action: async () => {
       let { packageJson, path } = await readPkgSafe();
 
-      let allConfigs = await getConfig(selectedPackages, 'getPackageJson', {
+      let allConfigs = await getConfig('getPackageJson', {
         packageJson,
         selectedPackages,
       });
@@ -79,14 +78,15 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
         packageJson,
       );
 
-      let keyOrder = uniq([
+      let keyOrder: (keyof PackageJson)[] = uniq([
         'name',
         'version',
         'description',
+        'source',
         'main',
         'module',
+        'esmodule',
         'umd:main',
-        'source',
         'types',
         'repository',
         'author',
@@ -104,23 +104,24 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
         'peerDependencies',
         'publishConfig',
         'config',
-        ...Object.keys(mergedConfig),
+        ...Object.keys(mergedConfig).sort(),
       ]);
 
       let ignoredKeys: (keyof PackageJson)[] = ['readme', '_id'];
 
-      let orderedPackageJson = keyOrder.reduce<PackageJson>((acc, key) => {
-        if (ignoredKeys.includes(key)) return acc;
+      let orderedPackageJson: PackageJson = {};
+      for (let key of keyOrder) {
+        if (!ignoredKeys.includes(key)) {
+          orderedPackageJson[key] = mergedConfig[key];
+        }
+      }
 
-        const value = mergedConfig[key];
-        if (value) return { ...acc, [key]: value };
-        return acc;
-      }, {});
-
-      await fs.writeFile(
-        path,
+      let content = template(
         JSON.stringify(orderedPackageJson, null, 2) + '\n',
+        packageJson,
       );
+
+      await fs.writeFile(path, content);
     },
   };
 
@@ -132,18 +133,8 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
       let cli = await readPkgSafe({ cwd: __dirname });
 
       let allFiles = (
-        await getConfig(selectedPackages, 'getFiles', {
-          packageJson,
-          selectedPackages,
-        })
+        await getConfig('getFiles', { packageJson, selectedPackages })
       ).flat();
-
-      let github: { user: string; repo: string } | void;
-      if (typeof packageJson.repository === 'string') {
-        github = extractGithubRepo(packageJson.repository);
-      } else if (packageJson.repository != null) {
-        github = extractGithubRepo(packageJson.repository.url);
-      }
 
       let projectBase = dirname(path);
       let cliBase = dirname(cli.path);
@@ -155,8 +146,7 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
           );
 
           if (fileConfig.template.includes('.hbs')) {
-            let template = Handlebars.compile(content);
-            content = template({ pkg: packageJson, github });
+            content = template(content, packageJson);
           }
 
           await fs.mkdir(dirname(fileConfig.output), { recursive: true });
@@ -172,10 +162,7 @@ export const packagesToTasks = (selectedPackages: PackageConfig[]): Task[] => {
     action: async () => {
       let { packageJson, path } = await readPkgSafe();
       let allScripts = (
-        await getConfig(selectedPackages, 'postSetupScripts', {
-          packageJson,
-          selectedPackages,
-        })
+        await getConfig('postSetupScripts', { packageJson, selectedPackages })
       ).flat(1);
 
       for (let [program, ...args] of allScripts) {
@@ -204,32 +191,27 @@ async function readPkgSafe(
 }
 
 async function getConfig(
-  selectedPackages: PackageConfig[],
   key: 'getDependencies',
   params: PackageMethodParams,
 ): Promise<Dependecies[]>;
 async function getConfig(
-  selectedPackages: PackageConfig[],
   key: 'getPackageJson',
   params: PackageMethodParams,
 ): Promise<Partial<PackageJson>[]>;
 async function getConfig(
-  selectedPackages: PackageConfig[],
   key: 'getFiles',
   params: PackageMethodParams,
 ): Promise<Files[][]>;
 async function getConfig(
-  selectedPackages: PackageConfig[],
   key: 'postSetupScripts',
   params: PackageMethodParams,
 ): Promise<string[][][]>;
 async function getConfig(
-  selectedPackages: PackageConfig[],
   key: keyof Omit<PackageConfig, 'name' | 'description'>,
   params: PackageMethodParams,
 ) {
   let result = await Promise.all(
-    selectedPackages.map(async (config) => {
+    params.selectedPackages.map(async (config) => {
       let method = config[key];
       if (method == null) return undefined;
       if (typeof method === 'function') {
@@ -241,4 +223,18 @@ async function getConfig(
   );
 
   return result.filter(excludeEmpty);
+}
+
+function template(src: string, pkg: PackageJson) {
+  let github: { user: string; repo: string } | void;
+  if (typeof pkg.repository === 'string') {
+    github = extractGithubRepo(pkg.repository);
+  } else if (pkg.repository != null) {
+    github = extractGithubRepo(pkg.repository.url);
+  }
+
+  let templ = Handlebars.compile(src);
+  let result = templ({ pkg, github });
+
+  return result;
 }
