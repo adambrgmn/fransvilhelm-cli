@@ -1,5 +1,15 @@
 # @fransvilhelm/cli
 
+## 1.2.0
+
+### Minor Changes
+
+- Setup microbundle package (by [@adambrgmn](https://github.com/adambrgmn) in
+  [#11](https://github.com/adambrgmn/fransvilhelm-cli/pull/11))
+- Add filter and search to select component (by
+  [@adambrgmn](https://github.com/adambrgmn) in
+  [#12](https://github.com/adambrgmn/fransvilhelm-cli/pull/12))
+
 ## 1.1.0
 
 ### Minor Changes
