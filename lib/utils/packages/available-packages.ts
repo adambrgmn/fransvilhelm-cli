@@ -35,21 +35,7 @@ const eslint: PackageConfig = {
       lint: 'eslint . --ext .ts --ext .tsx --ext .js',
     },
     eslintConfig: {
-      extends: 'react-app',
-      rules: {
-        'import/order': [
-          'warn',
-          {
-            'newlines-between': 'always',
-            groups: [
-              'builtin',
-              'external',
-              'internal',
-              ['parent', 'sibling', 'index'],
-            ],
-          },
-        ],
-      },
+      extends: ['react-app', 'react-app/jest'],
     },
   }),
 };
