@@ -1,5 +1,21 @@
 # @fransvilhelm/cli
 
+## 1.3.0
+
+### Minor Changes
+
+- Bump min node version (by [@adambrgmn](https://github.com/adambrgmn) in
+  [#14](https://github.com/adambrgmn/fransvilhelm-cli/pull/14))
+- Update default tsconfig (by [@adambrgmn](https://github.com/adambrgmn) in
+  [#14](https://github.com/adambrgmn/fransvilhelm-cli/pull/14))
+- Bump all dependencies (by [@adambrgmn](https://github.com/adambrgmn) in
+  [#14](https://github.com/adambrgmn/fransvilhelm-cli/pull/14))
+- Update eslint config (by [@adambrgmn](https://github.com/adambrgmn) in
+  [#14](https://github.com/adambrgmn/fransvilhelm-cli/pull/14))
+- Install @testing-library/user-event (by
+  [@adambrgmn](https://github.com/adambrgmn) in
+  [#14](https://github.com/adambrgmn/fransvilhelm-cli/pull/14))
+
 ## 1.2.0
 
 ### Minor Changes
