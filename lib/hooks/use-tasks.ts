@@ -126,6 +126,7 @@ export const taskManagerMachine = createMachine<
         on: {
           NEW_TASK: {
             actions: assign({
+              // @ts-ignore
               tasks: (context, event) => [
                 ...context.tasks,
                 spawn(

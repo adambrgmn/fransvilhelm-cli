@@ -35,21 +35,7 @@ const eslint: PackageConfig = {
       lint: 'eslint . --ext .ts --ext .tsx --ext .js',
     },
     eslintConfig: {
-      extends: 'react-app',
-      rules: {
-        'import/order': [
-          'warn',
-          {
-            'newlines-between': 'always',
-            groups: [
-              'builtin',
-              'external',
-              'internal',
-              ['parent', 'sibling', 'index'],
-            ],
-          },
-        ],
-      },
+      extends: ['react-app', 'react-app/jest'],
     },
   }),
 };
@@ -71,14 +57,9 @@ const jest: PackageConfig = {
         // bundled with react-scripts
         !hasReactScripts && 'jest',
         '@testing-library/jest-dom',
+        '@testing-library/user-event',
         '@testing-library/react',
-        ...(hasTypescript
-          ? [
-              '@types/jest',
-              '@types/testing-library__jest-dom',
-              '@types/testing-library__react',
-            ]
-          : []),
+        ...(hasTypescript ? ['@types/jest'] : []),
         ...(!hasReactScripts && hasTypescript
           ? [
               '@babel/core',

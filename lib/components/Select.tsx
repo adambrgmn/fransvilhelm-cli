@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import figures from 'figures';
 import { Box, Text, useInput } from 'ink';
-import matchSorter from 'match-sorter';
+import { matchSorter } from 'match-sorter';
 
 import { Choice } from './MultiSelect';
 import { SelectFAQ, FaqItem } from './SelectFaq';
