@@ -67,7 +67,7 @@
     "@types/ink": "^2.0.3",
     "@types/jest": "^26.0.19",
     "@types/lodash": "^4.14.165",
-    "@types/node": "^14.14.13",
+    "@types/node": "^14.14.34",
     "@types/prop-types": "^15.7.3",
     "@types/react": "^17.0.0",
     "@types/read-pkg-up": "^6.0.0",
