@@ -192,30 +192,43 @@ async function readPkgSafe(
 
 async function getConfig(
   key: 'getDependencies',
-  params: PackageMethodParams,
+  params: Pick<PackageMethodParams, 'packageJson' | 'selectedPackages'>,
 ): Promise<Dependecies[]>;
 async function getConfig(
   key: 'getPackageJson',
-  params: PackageMethodParams,
+  params: Pick<PackageMethodParams, 'packageJson' | 'selectedPackages'>,
 ): Promise<Partial<PackageJson>[]>;
 async function getConfig(
   key: 'getFiles',
-  params: PackageMethodParams,
+  params: Pick<PackageMethodParams, 'packageJson' | 'selectedPackages'>,
 ): Promise<Files[][]>;
 async function getConfig(
   key: 'postSetupScripts',
-  params: PackageMethodParams,
+  params: Pick<PackageMethodParams, 'packageJson' | 'selectedPackages'>,
 ): Promise<string[][][]>;
 async function getConfig(
   key: keyof Omit<PackageConfig, 'name' | 'description'>,
-  params: PackageMethodParams,
+  params: Pick<PackageMethodParams, 'packageJson' | 'selectedPackages'>,
 ) {
   let result = await Promise.all(
     params.selectedPackages.map(async (config) => {
       let method = config[key];
       if (method == null) return undefined;
       if (typeof method === 'function') {
-        return method(params);
+        return method({
+          ...params,
+          hasInstalledDep(dep) {
+            return (
+              params.packageJson.dependencies?.[dep] != null ||
+              params.packageJson.devDependencies?.[dep] != null
+            );
+          },
+          hasPackage(pkg) {
+            return (
+              params.selectedPackages.findIndex((p) => p.name === pkg) > -1
+            );
+          },
+        });
       }
 
       return method;

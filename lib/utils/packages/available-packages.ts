@@ -1,5 +1,3 @@
-import { PackageJson } from 'read-pkg-up';
-
 import { excludeEmpty } from '../../utils';
 import { getPeerDependecies } from './get-peer-dependecies';
 import { PackageConfig } from './types';
@@ -7,12 +5,10 @@ import { PackageConfig } from './types';
 const eslint: PackageConfig = {
   name: 'eslint',
   description: 'With eslint-config-react-app',
-  getDependencies: async ({ packageJson, selectedPackages }) => {
-    let hasReactScripts = hasInstalledPackage('react-scripts', packageJson);
-    let hasTypescript = hasPackage('typescript', {
-      packageJson,
-      selectedPackages,
-    });
+  getDependencies: async ({ hasPackage, hasInstalledDep }) => {
+    let hasReactScripts = hasInstalledDep('react-scripts');
+    let hasTypescript =
+      hasPackage('typescript') || hasInstalledDep('typescript');
 
     let devDependencies: string[] = [];
     if (!hasReactScripts) {
@@ -43,12 +39,10 @@ const eslint: PackageConfig = {
 const jest: PackageConfig = {
   name: 'jest',
   description: 'With react-testing-library',
-  getDependencies: async ({ packageJson, selectedPackages }) => {
-    let hasReactScripts = hasInstalledPackage('react-scripts', packageJson);
-    let hasTypescript = hasPackage('typescript', {
-      packageJson,
-      selectedPackages,
-    });
+  getDependencies: async ({ hasPackage, hasInstalledDep }) => {
+    let hasReactScripts = hasInstalledDep('react-scripts');
+    let hasTypescript =
+      hasPackage('typescript') || hasInstalledDep('typescript');
 
     return {
       dependencies: [],
@@ -71,16 +65,14 @@ const jest: PackageConfig = {
       ].filter(excludeEmpty),
     };
   },
-  getPackageJson: (packageJson) => {
-    let hasReactScripts = hasInstalledPackage('react-scripts', packageJson);
+  getPackageJson: ({ hasInstalledDep }) => {
+    let hasReactScripts = hasInstalledDep('react-scripts');
     return hasReactScripts ? {} : { scripts: { test: 'jest' } };
   },
-  getFiles: ({ packageJson, selectedPackages }) => {
-    let hasReactScripts = hasInstalledPackage('react-scripts', packageJson);
-    let hasTypescript = hasPackage('typescript', {
-      packageJson,
-      selectedPackages,
-    });
+  getFiles: ({ hasPackage, hasInstalledDep }) => {
+    let hasReactScripts = hasInstalledDep('react-scripts');
+    let hasTypescript =
+      hasPackage('typescript') || hasInstalledDep('typescript');
 
     if (hasReactScripts) return [];
     return [
@@ -103,38 +95,41 @@ const husky: PackageConfig = {
     dependencies: [],
     devDependencies: ['husky'],
   },
-  getPackageJson: ({ packageJson, selectedPackages }) => {
-    let hasLintStaged = hasPackage('lint-staged', {
-      packageJson,
-      selectedPackages,
-    });
+  getPackageJson: {
+    scripts: {
+      prepare: 'husky install',
+    },
+  },
+  postSetupScripts: ({ hasPackage }) => {
+    let hasLintStaged = hasPackage('lint-staged');
 
-    if (!hasLintStaged) return { husky: { hooks: {} } };
+    if (hasLintStaged) {
+      return [
+        ['yarn', 'husky', 'add', '.husky/pre-commit', 'yarn run lint-staged'],
+      ];
+    }
 
-    return {
-      husky: {
-        hooks: {
-          'pre-commit': 'lint-staged',
-        },
-      },
-    };
+    return [];
   },
 };
 
 const lintStaged: PackageConfig = {
   name: 'lint-staged',
-  description: 'With prettier setup',
+  description: 'With prettier and eslint setup',
   getDependencies: {
     dependencies: [],
     devDependencies: ['lint-staged'],
   },
-  getPackageJson: ({ selectedPackages }) => {
-    const hasPrettier = hasSelectedPackage('prettier', selectedPackages);
+  getPackageJson: ({ hasPackage, hasInstalledDep }) => {
+    const hasEslint = hasPackage('eslint') || hasInstalledDep('eslint');
+    const hasPrettier = hasPackage('prettier') || hasInstalledDep('prettier');
 
     return {
       'lint-staged': {
-        ...(hasPrettier && {
+        ...(hasEslint && {
           '*.{js,ts,jsx,tsx}': ['eslint --fix'],
+        }),
+        ...(hasPrettier && {
           '*.{js,ts,jsx,tsx,json,md,yml,html}': ['prettier --write'],
         }),
       },
@@ -161,9 +156,9 @@ const prettier: PackageConfig = {
 const typescript: PackageConfig = {
   name: 'typescript',
   description: 'With basic tsconfig.json',
-  getDependencies: (packageJson) => {
-    let hasReact = hasInstalledPackage('react', packageJson);
-    let hasReactDOM = hasInstalledPackage('react-dom', packageJson);
+  getDependencies: ({ hasInstalledDep }) => {
+    let hasReact = hasInstalledDep('react');
+    let hasReactDOM = hasInstalledDep('react-dom');
 
     return {
       dependencies: [],
@@ -251,34 +246,3 @@ export const packages: PackageConfig[] = [
   changesets,
   pr,
 ];
-
-// ------- Utils
-function hasPackage(
-  pkgName: string,
-  {
-    packageJson,
-    selectedPackages,
-  }: { packageJson: PackageJson; selectedPackages: PackageConfig[] },
-): boolean {
-  return (
-    hasSelectedPackage(pkgName, selectedPackages) ||
-    hasInstalledPackage(pkgName, packageJson)
-  );
-}
-
-function hasInstalledPackage(
-  pkgName: string,
-  packageJson: PackageJson,
-): boolean {
-  return (
-    packageJson.dependencies?.[pkgName] != null ||
-    packageJson.devDependencies?.[pkgName] != null
-  );
-}
-
-function hasSelectedPackage(
-  pkgName: string,
-  selectedPackages: PackageConfig[],
-): boolean {
-  return selectedPackages.findIndex((p) => p.name === pkgName) > -1;
-}

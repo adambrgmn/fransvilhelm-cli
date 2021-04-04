@@ -14,6 +14,8 @@ export interface Files {
 export type PackageMethodParams = {
   packageJson: PackageJson;
   selectedPackages: PackageConfig[];
+  hasPackage(expectedPkg: string): boolean;
+  hasInstalledDep(expectedDep: string): boolean;
 };
 
 export type PackageMethod<R> =
