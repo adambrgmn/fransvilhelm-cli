@@ -1,26 +1,78 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
+import { useMachine } from '@xstate/react';
 import figure from 'figures';
-import { Box, Text, useInput } from 'ink';
+import { Box, Text, useApp, useInput } from 'ink';
 import { matchSorter } from 'match-sorter';
-import React, { Suspense, useLayoutEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 import { SpinnerBox } from './components/Spinner';
+import { machine } from './machine';
+import { Project } from './types';
 import { findProjects } from './utils/find-projects';
 import { createSuspenseCache } from './utils/suspense-cache';
 
 export const App: React.FC = () => {
+  const [state, send] = useMachine(machine);
+  const app = useApp();
+
+  useEffect(() => {
+    if (!state.done) return;
+    if (state.matches('success')) return app.exit();
+
+    let error = state.context.error instanceof Error ? state.context.error : new Error('Unknown error');
+    return app.exit(error);
+  }, [app, state]);
+
   return (
     <Suspense fallback={<SpinnerBox />}>
-      <Projects />
+      {state.matches('select') ? <Projects onSelect={(project) => send({ type: 'SELECT', payload: project })} /> : null}
+      {state.matches('acting') ? <SpinnerBox /> : null}
+      {state.matches('success') ? <Success project={state.context.selected as Project} /> : null}
+      {state.matches('error') ? <Failure error={state.context.error} /> : null}
     </Suspense>
   );
 };
 
+const Success: React.FC<{ project: Project }> = ({ project }) => {
+  return (
+    <Box>
+      <Text>
+        {figure.tick} Project "{project.name}" opened in editor
+      </Text>
+      <Text>
+        {figure.tick} Project path copied to clipboard ({project.path})
+      </Text>
+    </Box>
+  );
+};
+
+const Failure: React.FC<{ error: unknown }> = ({ error }) => {
+  let message = error instanceof Error ? error.message : 'Unknown error';
+
+  return (
+    <Box>
+      <Box>
+        <Text>An error occured while opening the project</Text>
+      </Box>
+      <Box>
+        <Text>{message}</Text>
+      </Box>
+      <Box>
+        <Text>{(error as any).toString()}</Text>
+      </Box>
+    </Box>
+  );
+};
+
+interface ProjectsProps {
+  onSelect: (project: Project) => void;
+}
+
 const projectsCache = createSuspenseCache((key: string) => findProjects([key]));
 
-const Projects: React.FC = () => {
+const Projects: React.FC<ProjectsProps> = ({ onSelect }) => {
   let projects = projectsCache.read(path.join(os.homedir(), 'Developer'));
 
   let [filter, setFilter] = useState('');
@@ -51,7 +103,13 @@ const Projects: React.FC = () => {
         </Box>
         <Input value={filter} onChange={setFilter} />
       </Box>
-      <SelectList items={selectableItems} onSelect={() => {}} />
+      <SelectList
+        items={selectableItems}
+        onSelect={(value) => {
+          let project = projects.find((p) => p.path === value);
+          if (project != null) onSelect(project);
+        }}
+      />
     </Box>
   );
 };

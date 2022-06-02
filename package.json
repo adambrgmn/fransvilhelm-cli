@@ -31,12 +31,16 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@xstate/react": "^3.0.0",
     "cli-spinners": "^2.6.1",
+    "clipboardy": "^3.0.0",
+    "execa": "^6.1.0",
     "figures": "^4.0.1",
     "git-repo-info": "^2.1.1",
     "ink": "^3.2.0",
     "match-sorter": "^6.3.1",
-    "react": "^18.1.0"
+    "react": "^18.1.0",
+    "xstate": "^4.32.1"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
