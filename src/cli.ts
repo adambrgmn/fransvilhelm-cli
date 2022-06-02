@@ -1,12 +1,8 @@
 #!/usr/bin/env node
+/// <reference types="react/experimental" />
+import { render } from 'ink';
+import { createElement } from 'react';
 
-import { readFile } from 'node:fs/promises';
+import { App } from './App';
 
-const readPackageJson = async (): Promise<string> => {
-  return readFile('package.json', 'utf-8');
-};
-
-(async () => {
-  let f = await readPackageJson();
-  console.log(f.length);
-})();
+render(createElement(App, {}));

@@ -31,14 +31,18 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "cli-spinners": "^2.6.1",
+    "figures": "^4.0.1",
     "git-repo-info": "^2.1.1",
     "ink": "^3.2.0",
+    "match-sorter": "^6.3.1",
     "react": "^18.1.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/jest": "^27.5.1",
     "@types/node": "^17.0.38",
+    "@types/react": "^18.0.10",
     "eslint": "^8.16.0",
     "eslint-config-react-app": "^7.0.1",
     "husky": "^8.0.1",
