@@ -1,6 +1,14 @@
-import cliSpinners, { SpinnerName } from 'cli-spinners';
 import { Box, BoxProps, Text, TextProps } from 'ink';
 import React, { useEffect, useState } from 'react';
+
+const spinners = {
+  dots: {
+    interval: 80,
+    frames: ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'],
+  },
+} as const;
+
+type SpinnerName = keyof typeof spinners;
 
 interface Props {
   spinner?: SpinnerName;
@@ -8,7 +16,7 @@ interface Props {
 }
 
 export const Spinner: React.FC<Props & TextProps> = ({ spinner = 'dots', interval, ...props }) => {
-  let instance = cliSpinners[spinner];
+  let instance = spinners[spinner];
   let finalInterval = interval ?? instance.interval;
   let [frame, setFrame] = useState(0);
 

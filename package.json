@@ -30,10 +30,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "cli-spinners": "^2.6.1",
     "clipboardy": "^3.0.0",
     "execa": "^6.1.0",
-    "figures": "^4.0.1",
     "git-repo-info": "^2.1.1",
     "ink": "^3.2.0",
     "match-sorter": "^6.3.1",

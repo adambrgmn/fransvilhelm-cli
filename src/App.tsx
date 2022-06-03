@@ -3,7 +3,6 @@ import * as path from 'node:path';
 
 import clipboardy from 'clipboardy';
 import { execa } from 'execa';
-import figure from 'figures';
 import { Box, Text, useApp, useInput } from 'ink';
 import { matchSorter } from 'match-sorter';
 import React, { Fragment, useLayoutEffect, useMemo, useState } from 'react';
@@ -11,6 +10,7 @@ import { QueryClient, QueryClientProvider, useMutation, useQuery } from 'react-q
 
 import { SpinnerBox } from './components/Spinner';
 import { Project } from './types';
+import * as figures from './utils/figures';
 import { findProjects } from './utils/find-projects';
 
 const ROOTS = [path.join(os.homedir(), 'Developer')];
@@ -52,10 +52,10 @@ const Success: React.FC<{ project: Project }> = ({ project }) => {
   return (
     <Box flexDirection="column" paddingLeft={1}>
       <Text>
-        <Text color="green">{figure.tick}</Text> Project <Text color="blue">{project.name}</Text> opened in editor
+        <Text color="green">{figures.tick}</Text> Project <Text color="blue">{project.name}</Text> opened in editor
       </Text>
       <Text>
-        <Text color="green">{figure.tick}</Text> Project path copied to clipboard:
+        <Text color="green">{figures.tick}</Text> Project path copied to clipboard:
         <Text color="blue"> {project.path.replace(os.homedir(), '~')}</Text>
       </Text>
     </Box>
@@ -69,7 +69,7 @@ const Failure: React.FC<{ error: unknown }> = ({ error }) => {
     <Box flexDirection="column">
       <Box>
         <Text color="gray">
-          <Text color="red">{figure.cross}</Text> An error occured while opening the project
+          <Text color="red">{figures.cross}</Text> An error occured while opening the project
         </Text>
       </Box>
       <Box marginBottom={1}>
@@ -170,7 +170,7 @@ const SelectList: React.FC<SelectListProps> = ({ items, onSelect }) => {
         return (
           <Box key={item.value} flexDirection="row">
             <Box paddingX={1}>
-              <Text color="green">{current ? figure.arrowRight : ' '}</Text>
+              <Text color="green">{current ? figures.arrowRight : ' '}</Text>
             </Box>
             <Box>{item.label(current)}</Box>
           </Box>
