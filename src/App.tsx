@@ -2,7 +2,6 @@ import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 
-import clipboardy from 'clipboardy';
 import { execa } from 'execa';
 import { Box, Text, useApp, useInput } from 'ink';
 import { matchSorter } from 'match-sorter';
@@ -11,6 +10,7 @@ import { QueryClient, QueryClientProvider, useMutation, useQuery } from 'react-q
 
 import { SpinnerBox } from './components/Spinner';
 import { Project } from './types';
+import * as clipboard from './utils/clipboard';
 import * as figures from './utils/figures';
 import { findProjects } from './utils/find-projects';
 
@@ -21,7 +21,7 @@ export const App: React.FC = () => {
   const mutation = useMutation(
     async (project: Project) => {
       await execa(process.env.EDITOR ?? 'code', [project.path]);
-      await clipboardy.write(project.path);
+      await clipboard.write(project.path);
       return project;
     },
     {
