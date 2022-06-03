@@ -3,6 +3,14 @@
 import { render } from 'ink';
 import { createElement } from 'react';
 
-import { App } from './App';
+import { App, AppProviders } from './App';
 
-render(createElement(App, {}));
+(async () => {
+  try {
+    let { waitUntilExit } = render(createElement(AppProviders, { children: createElement(App, {}) }));
+    await waitUntilExit();
+    process.exit();
+  } catch (error) {
+    process.exit(1);
+  }
+})();

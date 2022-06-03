@@ -1,48 +1,62 @@
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-import { useMachine } from '@xstate/react';
+import clipboardy from 'clipboardy';
+import { execa } from 'execa';
 import figure from 'figures';
 import { Box, Text, useApp, useInput } from 'ink';
 import { matchSorter } from 'match-sorter';
-import React, { Suspense, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { Fragment, useLayoutEffect, useMemo, useState } from 'react';
+import { QueryClient, QueryClientProvider, useMutation, useQuery } from 'react-query';
 
 import { SpinnerBox } from './components/Spinner';
-import { machine } from './machine';
 import { Project } from './types';
 import { findProjects } from './utils/find-projects';
-import { createSuspenseCache } from './utils/suspense-cache';
+
+const ROOTS = [path.join(os.homedir(), 'Developer')];
 
 export const App: React.FC = () => {
-  const [state, send] = useMachine(machine);
   const app = useApp();
-
-  useEffect(() => {
-    if (!state.done) return;
-    if (state.matches('success')) return app.exit();
-
-    let error = state.context.error instanceof Error ? state.context.error : new Error('Unknown error');
-    return app.exit(error);
-  }, [app, state]);
+  const mutation = useMutation(
+    async (project: Project) => {
+      await execa(process.env.EDITOR ?? 'code', [project.path]);
+      await clipboardy.write(project.path);
+      return project;
+    },
+    {
+      onSuccess: () => {
+        setTimeout(() => app.exit());
+      },
+      onError: (error) => {
+        setTimeout(() => app.exit(error instanceof Error ? error : new Error('Unknown error')));
+      },
+    },
+  );
 
   return (
-    <Suspense fallback={<SpinnerBox />}>
-      {state.matches('select') ? <Projects onSelect={(project) => send({ type: 'SELECT', payload: project })} /> : null}
-      {state.matches('acting') ? <SpinnerBox /> : null}
-      {state.matches('success') ? <Success project={state.context.selected as Project} /> : null}
-      {state.matches('error') ? <Failure error={state.context.error} /> : null}
-    </Suspense>
+    <Fragment>
+      {mutation.status === 'idle' ? <Projects roots={ROOTS} onSelect={mutation.mutate} /> : null}
+      {mutation.status === 'loading' ? <SpinnerBox /> : null}
+      {mutation.status === 'success' ? <Success project={mutation.data} /> : null}
+      {mutation.status === 'error' ? <Failure error={mutation.error} /> : null}
+    </Fragment>
   );
+};
+
+const queryClient = new QueryClient();
+export const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
 
 const Success: React.FC<{ project: Project }> = ({ project }) => {
   return (
-    <Box>
+    <Box flexDirection="column" paddingLeft={1}>
       <Text>
-        {figure.tick} Project "{project.name}" opened in editor
+        <Text color="green">{figure.tick}</Text> Project <Text color="blue">{project.name}</Text> opened in editor
       </Text>
       <Text>
-        {figure.tick} Project path copied to clipboard ({project.path})
+        <Text color="green">{figure.tick}</Text> Project path copied to clipboard:
+        <Text color="blue"> {project.path.replace(os.homedir(), '~')}</Text>
       </Text>
     </Box>
   );
@@ -52,33 +66,35 @@ const Failure: React.FC<{ error: unknown }> = ({ error }) => {
   let message = error instanceof Error ? error.message : 'Unknown error';
 
   return (
-    <Box>
+    <Box flexDirection="column">
       <Box>
-        <Text>An error occured while opening the project</Text>
+        <Text color="gray">
+          <Text color="red">{figure.cross}</Text> An error occured while opening the project
+        </Text>
+      </Box>
+      <Box marginBottom={1}>
+        <Text color="red">{message}</Text>
       </Box>
       <Box>
-        <Text>{message}</Text>
-      </Box>
-      <Box>
-        <Text>{(error as any).toString()}</Text>
+        <Text color="gray">{JSON.stringify(error, null, 2)}</Text>
       </Box>
     </Box>
   );
 };
 
 interface ProjectsProps {
+  roots: string[];
   onSelect: (project: Project) => void;
 }
 
-const projectsCache = createSuspenseCache((key: string) => findProjects([key]));
-
-const Projects: React.FC<ProjectsProps> = ({ onSelect }) => {
-  let projects = projectsCache.read(path.join(os.homedir(), 'Developer'));
-
+const Projects: React.FC<ProjectsProps> = ({ roots, onSelect }) => {
   let [filter, setFilter] = useState('');
+  let query = useQuery(['projects', ...roots], () => findProjects(roots));
 
   let selectableItems = useMemo(() => {
-    let p = projects.map<SelectListItem>((project) => {
+    if (query.status !== 'success') return [];
+
+    let projects = query.data.map<SelectListItem>((project) => {
       let parent = path.basename(path.dirname(project.path));
       return {
         value: project.path,
@@ -91,9 +107,11 @@ const Projects: React.FC<ProjectsProps> = ({ onSelect }) => {
       };
     });
 
-    if (filter === '') return p;
-    return matchSorter(p, filter, { keys: ['value'] });
-  }, [filter, projects]);
+    if (filter === '') return projects;
+    return matchSorter(projects, filter, { keys: ['value'] });
+  }, [filter, query]);
+
+  if (query.status === 'loading') return <SpinnerBox />;
 
   return (
     <Box flexDirection="column">
@@ -106,7 +124,7 @@ const Projects: React.FC<ProjectsProps> = ({ onSelect }) => {
       <SelectList
         items={selectableItems}
         onSelect={(value) => {
-          let project = projects.find((p) => p.path === value);
+          let project = query.data?.find((p) => p.path === value);
           if (project != null) onSelect(project);
         }}
       />
