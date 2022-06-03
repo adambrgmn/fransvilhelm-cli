@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 /// <reference types="react/experimental" />
+import process from 'node:process';
+
 import { render } from 'ink';
 import { createElement } from 'react';
 

@@ -1,5 +1,6 @@
-import * as os from 'node:os';
-import * as path from 'node:path';
+import os from 'node:os';
+import path from 'node:path';
+import process from 'node:process';
 
 import clipboardy from 'clipboardy';
 import { execa } from 'execa';

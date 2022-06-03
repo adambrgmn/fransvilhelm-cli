@@ -1,6 +1,6 @@
 import { readdir, stat } from 'node:fs/promises';
-import * as os from 'node:os';
-import * as path from 'node:path';
+import os from 'node:os';
+import path from 'node:path';
 
 import git from 'git-repo-info';
 
