@@ -96,7 +96,7 @@ const Projects: React.FC<ProjectsProps> = ({ roots, onSelect }) => {
     if (query.status !== 'success') return [];
 
     let projects = query.data.map<SelectListItem>((project) => {
-      let parent = path.basename(path.dirname(project.path));
+      let parent = path.basename(path.basename(project.path.replace(`/${project.name}`, '')));
       return {
         value: project.path,
         label: (current) => (

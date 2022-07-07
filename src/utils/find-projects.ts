@@ -10,11 +10,11 @@ export async function findProjects(roots: string[]): Promise<Project[]> {
   let projects: Project[] = [];
   let projectPaths = (
     await Promise.all(
-      roots.map((root) =>
-        readdirRecursive(path.isAbsolute(root) ? root : path.join(os.homedir(), root), (_, contents) =>
+      roots.map((root) => {
+        return readdirRecursive(path.isAbsolute(root) ? root : path.join(os.homedir(), root), (_, contents) =>
           contents.includes('.git'),
-        ),
-      ),
+        );
+      }),
     )
   )
     .flat()
@@ -22,11 +22,22 @@ export async function findProjects(roots: string[]): Promise<Project[]> {
 
   for (let projectPath of projectPaths) {
     let info = git(projectPath);
+
     projects.push({
       name: path.basename(projectPath),
       path: projectPath,
       branch: info.branch,
     });
+
+    if (projectPath.endsWith('klarna-app')) {
+      for (let subfolder of ['clients', 'services']) {
+        projects.push({
+          name: path.join(path.basename(projectPath), subfolder),
+          path: path.join(projectPath, subfolder),
+          branch: info.branch,
+        });
+      }
+    }
   }
 
   return projects;
