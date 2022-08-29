@@ -1,6 +1,5 @@
 import os from 'node:os';
 import path from 'node:path';
-import process from 'node:process';
 
 import { execa } from 'execa';
 import { Box, Text, useApp, useInput } from 'ink';
@@ -20,7 +19,7 @@ export const App: React.FC = () => {
   const app = useApp();
   const mutation = useMutation(
     async (project: Project) => {
-      await execa(process.env.EDITOR ?? 'code', [project.path]);
+      await execa('code', [project.path]);
       await clipboard.write(project.path);
       return project;
     },
