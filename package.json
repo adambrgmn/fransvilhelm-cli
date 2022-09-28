@@ -25,7 +25,7 @@
   "scripts": {
     "build": "tsup",
     "test": "jest",
-    "lint": "eslint . --ext .ts --ext .tsx --ext .js",
+    "lint": "eslint src --ext .ts --ext .tsx --ext .js",
     "type-check": "tsc --noEmit",
     "prepare": "husky install"
   },
