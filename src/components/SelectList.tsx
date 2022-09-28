@@ -1,5 +1,5 @@
 import { Box, useInput } from 'ink';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Figure } from './Figure';
 

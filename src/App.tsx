@@ -4,7 +4,7 @@ import path from 'node:path';
 import { execa } from 'execa';
 import { Box, Text, useApp } from 'ink';
 import { matchSorter } from 'match-sorter';
-import React, { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from 'react-query';
 
 import { Figure } from './components/Figure';

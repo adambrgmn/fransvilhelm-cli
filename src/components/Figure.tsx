@@ -1,5 +1,4 @@
 import { Text, TextProps } from 'ink';
-import React from 'react';
 
 const figures = {
   arrowRight: '→',
