@@ -34,7 +34,7 @@
     "@fransvilhelm/hooks": "^3.0.0",
     "@types/nanoid": "^2.1.0",
     "@xstate/react": "^1.1.0",
-    "axios": "^0.21.0",
+    "axios": "^1.1.3",
     "cli-spinners": "^2.5.0",
     "clipboardy": "^2.3.0",
     "execa": "^5.0.0",
