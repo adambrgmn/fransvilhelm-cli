@@ -43,7 +43,7 @@
     "ink": "^3.0.8",
     "lodash": "^4.17.20",
     "match-sorter": "^6.0.2",
-    "nanoid": "^3.1.20",
+    "nanoid": "^4.0.0",
     "pastel": "^1.1.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
