@@ -41,7 +41,7 @@
     "figures": "^3.2.0",
     "handlebars": "^4.7.6",
     "ink": "^3.0.8",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "match-sorter": "^6.0.2",
     "nanoid": "^3.1.20",
     "pastel": "^1.1.1",
