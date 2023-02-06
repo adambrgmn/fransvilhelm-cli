@@ -2866,13 +2866,13 @@
     "@typescript-eslint/types" "4.10.0"
     eslint-visitor-keys "^2.0.0"
 
-"@xstate/react@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@xstate/react/-/react-1.1.0.tgz#f8e869d77c682cdd4fdeb30bd7269ba414334856"
-  integrity sha512-ac5xAOFZ1AGsem0Y6uXG+zXWKXFDnZeJLBaXnJ84ReFHCWCCwF19JdtJgfu1t4I1r3jTnJR9W6eZKELVfvriqw==
+"@xstate/react@^3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@xstate/react/-/react-3.1.2.tgz#f03fad60a0aeb8eb45d8c4a1f6abc7769ef1ef18"
+  integrity sha512-nMpYuBFieWoHaImAtsguwmQHY3WnRpfRFYtInn5zRKsfGkC2JILKfnH58fODUubwhSqq0qMiUqrlaklP7ZBUCw==
   dependencies:
     use-isomorphic-layout-effect "^1.0.0"
-    use-subscription "^1.3.0"
+    use-sync-external-store "^1.0.0"
 
 abab@^2.0.0:
   version "2.0.3"
@@ -10963,6 +10963,11 @@ use-subscription@^1.3.0:
   integrity sha512-7+IIwDG/4JICrWHL/Q/ZPK5yozEnvRm6vHImu0LKwQlmWGKeiF7mbAenLlK/cTNXrTtXHU/SFASQHzB6+oSJMQ==
   dependencies:
     object-assign "^4.1.1"
+
+use-sync-external-store@^1.0.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
+  integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 use@^3.1.0:
   version "3.1.1"
